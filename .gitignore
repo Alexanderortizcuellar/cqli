@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# C/C++ object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.env
+
+# Application Specific Files
+temp_out.pgn
+temp_out.pgn.db
+temp_out_test.pgn
+scratch/
+*.db
+*.sqlite3
+pgn/
+# Logs
+*.log
+target/

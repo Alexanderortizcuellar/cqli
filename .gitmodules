@@ -1,0 +1,6 @@
+[submodule "gchessboard"]
+	path = gchessboard
+	url = https://github.com/alexanderortizcuellar/gchessboard
+[submodule "pgn_indexer"]
+	path = pgn_indexer
+	url = ./pgn_indexer
