@@ -1,7 +1,84 @@
 import sqlite3
+import re
 from typing import Dict
 
 from PyQt5 import QtCore, QtWidgets, QtGui
+
+def format_int_eco(eco_val) -> str:
+    if eco_val is None:
+        return "??"
+    try:
+        code = int(eco_val)
+        if code < 0 or code >= 500:
+            return "??"
+        letter = chr(ord('A') + (code // 100))
+        num = code % 100
+        return f"{letter}{num:02d}"
+    except Exception:
+        return "??"
+
+def get_eco_filter_sql(filter_text: str):
+    """
+    Returns (sql_condition_str, params_list) or None if it doesn't match an ECO pattern.
+    """
+    text = filter_text.strip().upper()
+    # Match full ECO code: e.g. "B12"
+    if re.match(r"^[A-E]\d{2}$", text):
+        letter = text[0]
+        num = int(text[1:3])
+        code = (ord(letter) - ord('A')) * 100 + num
+        return "g.eco = ?", [code]
+    # Match partial ECO prefix: e.g. "B1" (matches B10-B19)
+    elif re.match(r"^[A-E]\d$", text):
+        letter = text[0]
+        digit = int(text[1])
+        start_code = (ord(letter) - ord('A')) * 100 + digit * 10
+        end_code = start_code + 9
+        return "g.eco BETWEEN ? AND ?", [start_code, end_code]
+    # Match single letter ECO prefix: e.g. "B" (matches B00-B99)
+    elif re.match(r"^[A-E]$", text):
+        letter = text[0]
+        start_code = (ord(letter) - ord('A')) * 100
+        end_code = start_code + 99
+        return "g.eco BETWEEN ? AND ?", [start_code, end_code]
+    
+    return None
+
+RESULT_MAP = {
+    0: "*",
+    1: "0-1",
+    2: "1/2-1/2",
+    3: "1-0",
+}
+
+def format_int_result(res_val) -> str:
+    if res_val is None:
+        return "*"
+    try:
+        return RESULT_MAP.get(int(res_val), "*")
+    except Exception:
+        return "*"
+
+def format_int_date(date_val) -> str:
+    if date_val is None:
+        return "????.??.??"
+    try:
+        date_int = int(date_val)
+        if date_int <= 0:
+            return "????.??.??"
+        
+        # Extract components
+        year = date_int // 10000
+        month = (date_int % 10000) // 100
+        day = date_int % 100
+        
+        year_str = f"{year:04d}" if year > 0 else "????"
+        month_str = f"{month:02d}" if month > 0 else "??"
+        day_str = f"{day:02d}" if day > 0 else "??"
+        
+        return f"{year_str}.{month_str}.{day_str}"
+    except Exception:
+        return "????.??.??"
 
 
 class GameListTableModel(QtCore.QAbstractTableModel):
@@ -80,16 +157,22 @@ class GameListTableModel(QtCore.QAbstractTableModel):
         cursor = self.conn.cursor()
         if self.filter_text:
             like_pat = f"%{self.filter_text}%"
+            eco_res = get_eco_filter_sql(self.filter_text)
+            if eco_res:
+                eco_cond, eco_params = eco_res
+            else:
+                eco_cond, eco_params = "g.eco = -2", []
+            
             cursor.execute(
-                """
+                f"""
                 SELECT COUNT(*) FROM games g
                 LEFT JOIN players pw ON g.white_id = pw.id
                 LEFT JOIN players pb ON g.black_id = pb.id
                 LEFT JOIN events e ON g.event_id = e.id
                 LEFT JOIN sites s ON g.site_id = s.id
-                WHERE pw.name LIKE ? OR pb.name LIKE ? OR e.name LIKE ? OR s.name LIKE ? OR g.eco LIKE ?
+                WHERE pw.name LIKE ? OR pb.name LIKE ? OR e.name LIKE ? OR s.name LIKE ? OR {eco_cond}
                 """,
-                (like_pat, like_pat, like_pat, like_pat, like_pat),
+                [like_pat, like_pat, like_pat, like_pat] + eco_params,
             )
             self.total_rows = cursor.fetchone()[0]
         else:
@@ -148,9 +231,9 @@ class GameListTableModel(QtCore.QAbstractTableModel):
             elif col_name == "Site":
                 return row_data[9]
             elif col_name == "Date":
-                return row_data[7]
+                return format_int_date(row_data[7])
             elif col_name == "Round":
-                return row_data[10]
+                return row_data[10] if row_data[10] is not None else "-"
             elif col_name == "White":
                 return row_data[1]
             elif col_name == "Black":
@@ -160,9 +243,9 @@ class GameListTableModel(QtCore.QAbstractTableModel):
             elif col_name == "EloB":
                 return str(row_data[5]) if row_data[5] is not None else ""
             elif col_name == "Result":
-                return row_data[3]
+                return format_int_result(row_data[3])
             elif col_name == "ECO":
-                return row_data[6]
+                return format_int_eco(row_data[6])
             elif col_name == "Moves":
                 return ""
 
@@ -186,18 +269,19 @@ class GameListTableModel(QtCore.QAbstractTableModel):
 
         if self.filter_text:
             like_pat = f"%{self.filter_text}%"
-            query = f"{query_base} WHERE pw.name LIKE ? OR pb.name LIKE ? OR e.name LIKE ? OR s.name LIKE ? OR g.eco LIKE ? ORDER BY {self.sort_column} {self.sort_order} LIMIT ? OFFSET ?"
+            eco_res = get_eco_filter_sql(self.filter_text)
+            if eco_res:
+                eco_cond, eco_params = eco_res
+            else:
+                eco_cond, eco_params = "g.eco = -2", []
+
+            query = (
+                f"{query_base} WHERE pw.name LIKE ? OR pb.name LIKE ? OR e.name LIKE ? OR s.name LIKE ? OR {eco_cond} "
+                f"ORDER BY {self.sort_column} {self.sort_order} LIMIT ? OFFSET ?"
+            )
             cursor.execute(
                 query,
-                (
-                    like_pat,
-                    like_pat,
-                    like_pat,
-                    like_pat,
-                    like_pat,
-                    self._cache_size,
-                    start,
-                ),
+                [like_pat, like_pat, like_pat, like_pat] + eco_params + [self._cache_size, start],
             )
         else:
             query = f"{query_base} ORDER BY {self.sort_column} {self.sort_order} LIMIT ? OFFSET ?"
@@ -240,14 +324,14 @@ class GameListTableModel(QtCore.QAbstractTableModel):
         return {
             "Event": row_data[8],
             "Site": row_data[9],
-            "Date": row_data[7],
-            "Round": row_data[10],
+            "Date": format_int_date(row_data[7]),
+            "Round": row_data[10] if row_data[10] is not None else "-",
             "White": row_data[1],
             "Black": row_data[2],
             "EloW": str(row_data[4]) if row_data[4] is not None else "",
             "EloB": str(row_data[5]) if row_data[5] is not None else "",
-            "Result": row_data[3],
-            "ECO": row_data[6],
+            "Result": format_int_result(row_data[3]),
+            "ECO": format_int_eco(row_data[6]),
             "_offset": row_data[11],
             "_length": row_data[12],
             "_pgn_path": self.pgn_path,
