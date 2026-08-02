@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QApplication,
     QSplitter,
 )
-from PyQt5.QtCore import QSize, Qt, QUrl, pyqtSignal
+from PyQt5.QtCore import QSize, Qt, QUrl, pyqtSignal, QEvent
 from PyQt5.QtGui import QFont
 import qtawesome as qta
 import re
@@ -20,28 +20,7 @@ from widgets.chessboard_widget import ChessBoardWidget
 from widgets.game_metadata_widget import GameMetadataWidget
 from widgets.move_list_widget import MovesListWidget
 from widgets.analysis_widget import AnalysisWidget
-
-
-class VariationsDialog(QDialog):
-    def __init__(self, variations: dict, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Select Variation")
-        self.resize(300, 200)
-
-        layout = QVBoxLayout(self)
-        self.selected_index = None
-
-        for index, item in variations.items():
-            button = QPushButton(f"{item['san']}")
-            button.setFont(QFont("Segoe UI", 12))
-            button.setStyleSheet("QPushButton { padding: 8px; font-weight: bold; }")
-            button.clicked.connect(lambda _, idx=index: self.select_variation(idx))
-            layout.addWidget(button)
-
-    def select_variation(self, index):
-        self.selected_index = index
-        self.accept()
-
+from dialogs.variations_dlg import VariationsDialog
 
 class GameExplorerWidget(QWidget):
     """
@@ -197,6 +176,11 @@ class GameExplorerWidget(QWidget):
 
         self.move_manager.pgnChanged.connect(lambda _: self.display_pgn())
 
+        # Event filter for mouse wheel navigation on chessboard
+        self.chessboard.installEventFilter(self)
+        self.chessboard.board_view.installEventFilter(self)
+        self.chessboard.board_view.viewport().installEventFilter(self)
+
     def load_game(self, game_info: dict):
         """Loads a PGN game into the browser."""
         self.analysis_widget.check_analysis.setChecked(False)
@@ -269,6 +253,7 @@ class GameExplorerWidget(QWidget):
     def flip_board(self):
         """Flips the chessboard orientation."""
         self.chessboard.flip()
+        self.chessboard.eval_bar.setFlipped(not self.chessboard.eval_bar._flipped)
 
     def on_anchor_clicked(self, url: QUrl):
         """Jump to a specific move index when its link is clicked in MovesListWidget."""
@@ -345,6 +330,18 @@ class GameExplorerWidget(QWidget):
 
     def send_position(self):
         """Send the current FEN position to Stockfish for evaluation."""
+        board = self.move_manager.current_node.board()
+        if board.is_game_over():
+            if self.engine.is_running():
+                self.engine.send_command("stop")
+                self.analysis_widget.reset_lines()
+            if board.is_checkmate():
+                winner = "white" if board.turn == chess.BLACK else "black"
+                self.chessboard.eval_bar.setEngineScore({"type": "checkmate", "winner": winner})
+            else:
+                self.chessboard.eval_bar.setEngineScore({"type": "draw"})
+            return
+
         if self.engine.is_running():
             self.engine.send_command("stop")
             self.analysis_widget.reset_lines()
@@ -353,6 +350,9 @@ class GameExplorerWidget(QWidget):
 
     def on_analysis_updated(self, info: dict):
         """Slot triggered when engine finishes a depth PV line."""
+        if self.move_manager.current_node.board().is_game_over():
+            return
+
         self.analysis_widget.update_analysis(info, self.chessboard.fen())
 
         if info.get("multipv", 1) == 1:
@@ -402,6 +402,22 @@ class GameExplorerWidget(QWidget):
         self.flip_btn.setIcon(qta.icon("ei.refresh", color=icon_color))
 
         self.display_pgn()
+
+    def eventFilter(self, watched, event):
+        if event.type() == QEvent.Wheel:
+            if watched in (
+                self.chessboard,
+                self.chessboard.board_view,
+                self.chessboard.board_view.viewport(),
+            ):
+                delta = event.angleDelta().y()
+                if delta > 0:
+                    self.forward()
+                elif delta < 0:
+                    self.backward()
+                event.accept()
+                return True
+        return super().eventFilter(watched, event)
 
     def closeEvent(self, event):
         """Quit the engine process when the window closes."""

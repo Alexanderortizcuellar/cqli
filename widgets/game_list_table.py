@@ -98,6 +98,7 @@ class GameListTableModel(QtCore.QAbstractTableModel):
         "EloB",
         "Result",
         "ECO",
+        "Move Count",
         "Moves",
     ]
 
@@ -112,6 +113,7 @@ class GameListTableModel(QtCore.QAbstractTableModel):
         "EloB": "g.black_elo",
         "Result": "g.result",
         "ECO": "g.eco",
+        "Move Count": "g.num_moves",
         "Moves": "g.id",
     }
 
@@ -213,7 +215,7 @@ class GameListTableModel(QtCore.QAbstractTableModel):
 
         if role == QtCore.Qt.TextAlignmentRole:
             col_name = self.HEADERS[col]
-            if col_name in ("EloW", "EloB", "Result", "Date", "Round", "ECO"):
+            if col_name in ("EloW", "EloB", "Result", "Date", "Round", "ECO", "Move Count"):
                 return QtCore.Qt.AlignCenter
 
         if role in (QtCore.Qt.DisplayRole, QtCore.Qt.EditRole):
@@ -246,6 +248,8 @@ class GameListTableModel(QtCore.QAbstractTableModel):
                 return format_int_result(row_data[3])
             elif col_name == "ECO":
                 return format_int_eco(row_data[6])
+            elif col_name == "Move Count":
+                return str(row_data[13]) if row_data[13] is not None else "0"
             elif col_name == "Moves":
                 return ""
 
@@ -259,7 +263,7 @@ class GameListTableModel(QtCore.QAbstractTableModel):
         cursor = self.conn.cursor()
 
         query_base = (
-            "SELECT g.id, pw.name AS white, pb.name AS black, g.result, g.white_elo, g.black_elo, g.eco, g.date, e.name AS event, s.name AS site, g.round, g.offset, g.length "
+            "SELECT g.id, pw.name AS white, pb.name AS black, g.result, g.white_elo, g.black_elo, g.eco, g.date, e.name AS event, s.name AS site, g.round, g.offset, g.length, g.num_moves "
             "FROM games g "
             "LEFT JOIN players pw ON g.white_id = pw.id "
             "LEFT JOIN players pb ON g.black_id = pb.id "
@@ -332,6 +336,7 @@ class GameListTableModel(QtCore.QAbstractTableModel):
             "EloB": str(row_data[5]) if row_data[5] is not None else "",
             "Result": format_int_result(row_data[3]),
             "ECO": format_int_eco(row_data[6]),
+            "Move Count": str(row_data[13]) if row_data[13] is not None else "0",
             "_offset": row_data[11],
             "_length": row_data[12],
             "_pgn_path": self.pgn_path,
@@ -487,6 +492,7 @@ class GameListTableWidget(QtWidgets.QWidget):
             "EloB": 75,
             "Result": 75,
             "ECO": 60,
+            "Move Count": 85,
         }
         for i, h in enumerate(GameListTableModel.HEADERS):
             width = default_widths.get(h, 100)
