@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QApplication,
     QSplitter,
 )
-from PyQt5.QtCore import QSize, Qt, QUrl, pyqtSignal, QEvent
+from PyQt5.QtCore import QSize, Qt, QUrl, pyqtSignal, QEvent, QTimer
 from PyQt5.QtGui import QFont
 import qtawesome as qta
 import re
@@ -17,8 +17,7 @@ import chess
 from core.move_manager import MoveManager
 from core.engine import ChessEngine
 from widgets.chessboard_widget import ChessBoardWidget
-from widgets.game_metadata_widget import GameMetadataWidget
-from widgets.move_list_widget import MovesListWidget
+from widgets.painter_pgn_browser import QPainterPGNBrowser
 from widgets.analysis_widget import AnalysisWidget
 from dialogs.variations_dlg import VariationsDialog
 
@@ -43,6 +42,28 @@ class GameExplorerWidget(QWidget):
         self.move_manager = MoveManager()
         self.move_manager.change_html_style(self.html_style)
         self.engine = ChessEngine(engine_path, self)
+
+        # ── Anti-lag: analysis throttle timer ──────────────────────────────
+        # Batches rapid engine info signals into at most one UI update per 100 ms.
+        self._analysis_update_timer = QTimer(self)
+        self._analysis_update_timer.setSingleShot(True)
+        self._analysis_update_timer.setInterval(100)
+        self._analysis_update_timer.timeout.connect(self._process_pending_analysis)
+        self._pending_analysis: dict = {}      # multipv → latest info dict
+        self._pending_fen: str | None = None
+        self._has_first_update: bool = False   # suppress timer for very first depth
+
+        # ── Anti-lag: engine debounce timer ───────────────────────────────
+        # Delays sending a new position to the engine by 150 ms during navigation
+        # so that scrolling through moves quickly only triggers one search start.
+        self._engine_debounce = QTimer(self)
+        self._engine_debounce.setSingleShot(True)
+        self._engine_debounce.setInterval(150)
+        self._engine_debounce.timeout.connect(self._run_debounced_send_position)
+        self._last_move_time: float = 0.0
+
+        # Enable keyboard focus for navigation
+        self.setFocusPolicy(Qt.StrongFocus)
 
         main_layout = QHBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
@@ -69,9 +90,7 @@ class GameExplorerWidget(QWidget):
         self.analysis_widget.set_theme(self.html_style)
         self.right_layout.addWidget(self.analysis_widget)
 
-        self.header_widget = None
-
-        self.browser = MovesListWidget(self, self.move_manager)
+        self.browser = QPainterPGNBrowser(self, self.move_manager)
         self.right_layout.addWidget(self.browser, 1)
 
         # Navigation Bar
@@ -174,7 +193,9 @@ class GameExplorerWidget(QWidget):
             lambda depth: self.analysis_widget.set_depth(f"depth {depth}")
         )
 
-        self.move_manager.pgnChanged.connect(lambda _: self.display_pgn())
+        # pgnChanged triggers a layout rebuild; activeNodeChanged scrolls to the active move
+        self.move_manager.pgnChanged.connect(lambda _: self.browser.rebuild_layout(force=True))
+        self.move_manager.activeNodeChanged.connect(self.browser.update_active_index)
 
         # Event filter for mouse wheel navigation on chessboard
         self.chessboard.installEventFilter(self)
@@ -190,20 +211,13 @@ class GameExplorerWidget(QWidget):
         self.move_manager.update_pgn(pgn_text)
         self.move_manager.jump_to_start()
 
-        if self.header_widget:
-            self.right_layout.removeWidget(self.header_widget)
-            self.header_widget.deleteLater()
-
-        self.header_widget = GameMetadataWidget(game_info)
-        self.right_layout.insertWidget(1, self.header_widget)
-
         start_fen = self.move_manager.current_node.board().fen()
         self.chessboard.update_board(start_fen)
-        self.display_pgn()
+        self.browser.rebuild_layout(force=True)
 
     def display_pgn(self):
-        """Syncs move manager html moves list into QTextBrowser."""
-        self.browser.setHtml(self.move_manager.html)
+        """Triggers a full rebuild of the painter PGN browser."""
+        self.browser.rebuild_layout(force=True)
 
     def handle_move(self, move_uci: str):
         """Handle move executed on the graphical chessboard."""
@@ -314,7 +328,12 @@ class GameExplorerWidget(QWidget):
             self.chessboard.set_eval_bar_visible(True)
             self.send_position()
         else:
-            self.engine.quit()
+            # stop_search (not quit) keeps the engine process alive — faster to
+            # restart on next analysis toggle, and the engine debounce timer
+            # won't fire against a dead process.
+            self._engine_debounce.stop()
+            self._clear_pending_analysis()
+            self.engine.stop_search()
             self.chessboard.set_eval_bar_visible(False)
             self.analysis_widget.clear()
 
@@ -328,12 +347,20 @@ class GameExplorerWidget(QWidget):
                 self.engine.quit()
                 self.toggle_analysis(True)
 
-    def send_position(self):
-        """Send the current FEN position to Stockfish for evaluation."""
+    def send_position(self, force: bool = False):
+        """Send current FEN to engine — with fast-navigation debouncing.
+
+        If the user is navigating faster than 4 moves/s the engine search is
+        stopped immediately and a 150 ms debounce timer is started so the
+        engine only resumes once the user pauses.  This eliminates the stutter
+        caused by repeatedly stopping/starting Stockfish on every arrow key.
+        """
+        import time
+
         board = self.move_manager.current_node.board()
         if board.is_game_over():
             if self.engine.is_running():
-                self.engine.send_command("stop")
+                self.engine.stop_search()
                 self.analysis_widget.reset_lines()
             if board.is_checkmate():
                 winner = "white" if board.turn == chess.BLACK else "black"
@@ -342,29 +369,91 @@ class GameExplorerWidget(QWidget):
                 self.chessboard.eval_bar.setEngineScore({"type": "draw"})
             return
 
-        if self.engine.is_running():
-            self.engine.send_command("stop")
-            self.analysis_widget.reset_lines()
-            fen = self.chessboard.fen()
-            self.engine.send_position(fen, mode="infinite")
+        # Do not start engine evaluation if analysis is disabled in the UI
+        if not self.analysis_widget.check_analysis.isChecked():
+            return
+
+        if not self.engine.is_running():
+            return
+
+        now = time.monotonic()
+        dt = now - self._last_move_time
+        self._last_move_time = now
+        is_fast = dt < 0.25  # faster than 4 moves/s
+
+        self._has_first_update = False
+        self._clear_pending_analysis()
+
+        if is_fast:
+            # Stop current search immediately; let debounce timer restart it
+            self.engine.stop_search()
+            self._engine_debounce.start()
+        else:
+            self._engine_debounce.stop()
+            self._run_debounced_send_position()
+
+    def _run_debounced_send_position(self):
+        """Actually send the position to the engine (called after debounce)."""
+        if not self.engine.is_running() or not self.analysis_widget.check_analysis.isChecked():
+            return
+        self.analysis_widget.reset_lines()
+        fen = self.chessboard.fen()
+        self.engine.send_position(fen, mode="infinite")
+
+    def _clear_pending_analysis(self):
+        """Discard any buffered analysis info that hasn't been rendered yet."""
+        self._pending_analysis.clear()
+        self._pending_fen = None
+        self._analysis_update_timer.stop()
+
+    def keyPressEvent(self, event):
+        """Handle arrow keys globally inside this widget hierarchy for navigation."""
+        if event.key() == Qt.Key_Right:
+            self.forward()
+            event.accept()
+        elif event.key() == Qt.Key_Left:
+            self.backward()
+            event.accept()
+        else:
+            super().keyPressEvent(event)
 
     def on_analysis_updated(self, info: dict):
-        """Slot triggered when engine finishes a depth PV line."""
+        """Buffer incoming engine info and render at most once per 100 ms.
+
+        The engine can emit dozens of `info depth …` lines per second — each
+        triggering HTML re-rendering.  Batching them eliminates the jank.
+        """
         if self.move_manager.current_node.board().is_game_over():
             return
 
-        self.analysis_widget.update_analysis(info, self.chessboard.fen())
-
+        # Update eval bar immediately (cheap — no HTML)
         if info.get("multipv", 1) == 1:
             score_type = info.get("score_type")
             score_value = info.get("score_value", 0)
-
             if self.chessboard.turn == chess.BLACK:
                 score_value = -score_value
+            self.chessboard.eval_bar.setEngineScore({"type": score_type, "value": score_value})
 
-            self.chessboard.eval_bar.setEngineScore(
-                {"type": score_type, "value": score_value}
-            )
+        # Buffer for batched HTML update
+        multipv = info.get("multipv", 1)
+        self._pending_analysis[multipv] = info
+        self._pending_fen = self.chessboard.fen()
+
+        if not self._has_first_update:
+            # Render the very first depth result immediately for responsiveness
+            self._has_first_update = True
+            self._process_pending_analysis()
+        elif not self._analysis_update_timer.isActive():
+            self._analysis_update_timer.start()
+
+    def _process_pending_analysis(self):
+        """Flush buffered analysis lines to AnalysisWidget in one render call."""
+        if not self._pending_analysis:
+            return
+        infos = sorted(self._pending_analysis.values(), key=lambda x: x.get("multipv", 1))
+        fen = self._pending_fen
+        self._pending_analysis.clear()
+        self.analysis_widget.update_analysis_batch(infos, fen)
 
     def save_pgn(self):
         """Triggered when the user wants to save edits back."""
@@ -401,7 +490,7 @@ class GameExplorerWidget(QWidget):
         )
         self.flip_btn.setIcon(qta.icon("ei.refresh", color=icon_color))
 
-        self.display_pgn()
+        self.browser.rebuild_layout(force=True)
 
     def eventFilter(self, watched, event):
         if event.type() == QEvent.Wheel:

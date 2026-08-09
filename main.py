@@ -258,28 +258,11 @@ class QueryTemplatesDialog(QDialog):
             except Exception as e:
                 print("Error deleting template:", e)
 
-
-class ChessboardDialog(QDialog):
-    def __init__(self, game_info: dict, parent=None, html_style=False):
-        super().__init__(parent)
-        self.setWindowFlags(Qt.Window)
-        self.setSizeGripEnabled(True)
-        self.setWindowTitle("Chessboard Explorer")
-        self.resize(1100, 680)
-
-        layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        self.browser = GameExplorerWidget(self, html_style=html_style)
-        layout.addWidget(self.browser)
-        self.browser.load_game(game_info)
-
-    def closeEvent(self, event):
-        self.browser.closeEvent(event)
-        event.accept()
-
-
 class ChessCQLiApp(QMainWindow):
+    # Emitted when the user double-clicks a game row.
+    # The AppController listens to this and opens ChessAppWindow.
+    gameSelected = pyqtSignal(dict)
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Chess CQLi Query Tool")
@@ -593,6 +576,10 @@ class ChessCQLiApp(QMainWindow):
         self.act_theme.setText("Dark Mode" if not self.dark_mode else "Light Mode")
         self._update_icons()
 
+        # Propagate theme to the chess window if the controller exists
+        if hasattr(self, "_app_controller") and self._app_controller is not None:
+            self._app_controller.set_theme(self.dark_mode)
+
     def _update_icons(self):
         icon_color = "#E5E7EB" if self.dark_mode else "#1F2937"
 
@@ -734,7 +721,8 @@ class ChessCQLiApp(QMainWindow):
             self.recent_menu.addAction(action)
 
     def show_chessboard_dialog(self, game: dict):
-        ChessboardDialog(game, self, html_style=self.dark_mode).exec_()
+        # Emit signal so AppController opens/reuses the ChessAppWindow.
+        self.gameSelected.emit(game)
 
     def run_query(self):
         if not self.pgnfilename:
@@ -987,6 +975,18 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     # Force loading standard qtawesome font
     qta.icon("fa5s.play")
+
     window = ChessCQLiApp()
+
+    # Wire the window-controller pattern (replaces ChessboardDialog popup)
+    from gui.app_controller import AppController
+    controller = AppController(window)
+    window._app_controller = controller  # keep alive for theme propagation
+
     window.show()
+
+    def _cleanup():
+        controller.cleanup()
+
+    app.aboutToQuit.connect(_cleanup)
     sys.exit(app.exec_())

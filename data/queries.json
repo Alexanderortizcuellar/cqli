@@ -82,6 +82,36 @@
     {
         "name": "GreekGiftAccepted",
         "description": "The classic Bxh7 greek gift.",
-        "query": "cql()\nresult 1-0\nline --> move from B to h7 capture p\n     --> move from k to h7 capture B\n     --> move from N to g5\n"
+        "query": "cql()\nresult 1-0\nline --> move from B to p capture h7\n     --> check\n     --> move previous from k to h7 capture B\n     --> move previous from N to g5"
+    },
+    {
+        "name": "QmateInh7h2",
+        "description": "finnds mates when Q was in h7/h2 and kig on g8/g1",
+        "query": "flipcolor {\n   player white \"Alexander2magnus\"\n   result 1-0\nmate\nQh7\nkg8\n}\n"
+    },
+    {
+        "name": "MateWithPawn",
+        "description": "mate delivered by a pawn",
+        "query": "cql()\nmate\nmove previous from [Pp]\n"
+    },
+    {
+        "name": "HowManyMatesIn1",
+        "description": "possible mates in 1 in a position",
+        "query": "move count legal : mate > 5"
+    },
+    {
+        "name": "xrayWithB-QR",
+        "description": "xray with bishop a king to a q or r",
+        "query": "// cql()\n// piece $night = N\n// [kb] attackedby $night >1 and not $night attacked by a\n\nflipcolor {\nxray(B k [qr])\nmove from k to _\n}\n"
+    },
+    {
+        "name": "NForksQK",
+        "description": "a Night forks a king and queen",
+        "query": "cql()\n\nflipcolor {\npiece $night = N\n[kq] attackedby $night >1 and not $night attacked by a\n}"
+    },
+    {
+        "name": "NForksUndefendedBK",
+        "description": "Night forks an undefended bishop and a king",
+        "query": "cql()\nflipcolor {\npiece $night = N\n[kb] attackedby $night >1 and not $night attacked by a\nand not b attackedby a\n}"
     }
 ]

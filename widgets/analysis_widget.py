@@ -1,18 +1,8 @@
 import sys
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QFont, QColor
-from PyQt5.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QHBoxLayout,
-    QLabel,
-    QTextBrowser,
-    QVBoxLayout,
-    QWidget,
-    QFrame,
-    QPushButton,
-)
-
+from PyQt5.QtWidgets import (QApplication, QCheckBox, QHBoxLayout, QLabel,
+                             QTextBrowser, QVBoxLayout, QWidget, QFrame, QPushButton)
 
 class AnalysisWidget(QWidget):
     evaluationToggled = pyqtSignal(bool)
@@ -21,45 +11,51 @@ class AnalysisWidget(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setMinimumHeight(150)
-
+        
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(5, 5, 5, 5)
         self.main_layout.setSpacing(2)
         self.setLayout(self.main_layout)
 
         # Analysis data storage
-        self.analysis_lines = {}  # multipv index -> info dict
+        self.analysis_lines = {} # multipv index -> info dict
+        self.is_dark = True
+        self.last_board_fen = None
 
         # --- Header Bar ---
         self.header_frame = QFrame()
         self.header_frame.setObjectName("AnalysisHeader")
         self.header_layout = QHBoxLayout(self.header_frame)
         self.header_layout.setContentsMargins(8, 4, 8, 4)
-
+        
         self.check_analysis = QCheckBox("Engine")
         self.check_analysis.setCursor(Qt.PointingHandCursor)
-        self.check_analysis.toggled.connect(lambda v: self.evaluationToggled.emit(v))
-
-        self.settings_btn = QPushButton()
-        self.settings_btn.setFlat(True)
-        self.settings_btn.setCursor(Qt.PointingHandCursor)
-        self.settings_btn.setToolTip("Configure Chess Engine")
-        self.settings_btn.clicked.connect(self.configClicked.emit)
-
+        self.check_analysis.toggled.connect(self.on_checkbox_toggled)
+        
+        from utils.helpers import _qicon
+        self.btn_config = QPushButton()
+        self.btn_config.setObjectName("SmallIconButton")
+        self.btn_config.setProperty("icon_name", "fa6s.gear")
+        self.btn_config.setIcon(_qicon("fa6s.gear", is_dark=self.is_dark))
+        self.btn_config.setIconSize(QSize(16, 16))
+        self.btn_config.setCursor(Qt.PointingHandCursor)
+        self.btn_config.setToolTip("Engine Config")
+        self.btn_config.clicked.connect(self.configClicked.emit)
+        
         self.score_label = QLabel("0.00")
         self.score_label.setFont(QFont("Arial", 10, QFont.Bold))
         self.score_label.setAlignment(Qt.AlignCenter)
-
+        
         self.depth_label = QLabel("depth 0")
         self.depth_label.setFont(QFont("Arial", 8))
-
+        
         self.header_layout.addWidget(self.check_analysis)
-        self.header_layout.addWidget(self.settings_btn)
+        self.header_layout.addWidget(self.btn_config)
         self.header_layout.addSpacing(10)
         self.header_layout.addWidget(self.score_label)
         self.header_layout.addStretch()
         self.header_layout.addWidget(self.depth_label)
-
+        
         self.main_layout.addWidget(self.header_frame)
 
         # --- Lines Area ---
@@ -67,29 +63,20 @@ class AnalysisWidget(QWidget):
         self.lines_display.setOpenExternalLinks(False)
         self.lines_display.setPlaceholderText("Enable engine for analysis...")
         self.main_layout.addWidget(self.lines_display)
-
-        self.set_theme(True)  # Default dark
+        
+        self.set_theme(True) # Default dark
 
     def set_theme(self, is_dark: bool):
-        import qtawesome as qta
-
+        self.is_dark = is_dark
+        if hasattr(self, "btn_config"):
+            from utils.helpers import _qicon
+            self.btn_config.setIcon(_qicon("fa6s.gear", is_dark=is_dark))
         if is_dark:
-            self.header_frame.setStyleSheet(
-                "QFrame#AnalysisHeader { background-color: #262421; border-radius: 3px; }"
-            )
+            self.header_frame.setStyleSheet("QFrame#AnalysisHeader { background-color: #262421; border-radius: 3px; }")
             self.check_analysis.setStyleSheet("color: #bababa; font-weight: bold;")
-            self.score_label.setStyleSheet(
-                "color: #ffffff; font-weight: bold; background: #312e2b; padding: 2px 8px; border-radius: 2px;"
-            )
+            self.score_label.setStyleSheet("color: #ffffff; font-weight: bold; background: #312e2b; padding: 2px 8px; border-radius: 2px;")
             self.depth_label.setStyleSheet("color: #8b8987;")
-            if hasattr(self, "settings_btn"):
-                self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#bababa"))
-                self.settings_btn.setIconSize(QSize(16, 16))
-                self.settings_btn.setStyleSheet(
-                    "QPushButton { border: none; background: transparent; padding: 2px; } QPushButton:hover { background-color: #312e2b; border-radius: 2px; }"
-                )
-            self.lines_display.setStyleSheet(
-                """
+            self.lines_display.setStyleSheet("""
                 QTextBrowser {
                     background-color: #262421;
                     border: none;
@@ -97,25 +84,13 @@ class AnalysisWidget(QWidget):
                     font-family: 'Noto Sans', 'Segoe UI', sans-serif;
                     font-size: 14px;
                 }
-            """
-            )
+            """)
         else:
-            self.header_frame.setStyleSheet(
-                "QFrame#AnalysisHeader { background-color: #e1e1e1; border-radius: 3px; border: 1px solid #ccc; }"
-            )
+            self.header_frame.setStyleSheet("QFrame#AnalysisHeader { background-color: #e1e1e1; border-radius: 3px; border: 1px solid #ccc; }")
             self.check_analysis.setStyleSheet("color: #312e2b; font-weight: bold;")
-            self.score_label.setStyleSheet(
-                "color: #000000; font-weight: bold; background: #ffffff; padding: 2px 8px; border: 1px solid #ccc; border-radius: 2px;"
-            )
+            self.score_label.setStyleSheet("color: #000000; font-weight: bold; background: #ffffff; padding: 2px 8px; border: 1px solid #ccc; border-radius: 2px;")
             self.depth_label.setStyleSheet("color: #555;")
-            if hasattr(self, "settings_btn"):
-                self.settings_btn.setIcon(qta.icon("fa5s.cog", color="#312e2b"))
-                self.settings_btn.setIconSize(QSize(16, 16))
-                self.settings_btn.setStyleSheet(
-                    "QPushButton { border: none; background: transparent; padding: 2px; } QPushButton:hover { background-color: #d1d1d1; border-radius: 2px; }"
-                )
-            self.lines_display.setStyleSheet(
-                """
+            self.lines_display.setStyleSheet("""
                 QTextBrowser {
                     background-color: #ffffff;
                     border: 1px solid #ccc;
@@ -123,8 +98,8 @@ class AnalysisWidget(QWidget):
                     font-family: 'Noto Sans', 'Segoe UI', sans-serif;
                     font-size: 14px;
                 }
-            """
-            )
+            """)
+        self.render_html()
 
     def set_depth(self, depth: str):
         text = depth.replace("=", " ")
@@ -138,24 +113,26 @@ class AnalysisWidget(QWidget):
         except ValueError:
             self.score_label.setText(score)
 
-    def update_analysis(self, info: dict, board_fen: str = None):
-        """Update analysis lines with new info."""
-        multipv = info.get("multipv", 1)
+    def on_checkbox_toggled(self, checked: bool):
+        if checked:
+            self.lines_display.setPlaceholderText("")
+        else:
+            self.lines_display.setPlaceholderText("Enable engine for analysis...")
+        self.evaluationToggled.emit(checked)
 
-        self.analysis_lines[multipv] = info
-
-        # Sort and render
+    def render_html(self):
+        if not self.analysis_lines:
+            return
+            
         sorted_indices = sorted(self.analysis_lines.keys())
-
+        
         import chess
-
-        board = chess.Board(board_fen) if board_fen else None
+        board = chess.Board(self.last_board_fen) if self.last_board_fen else None
         turn = board.turn if board else chess.WHITE
 
-        is_dark = self.header_frame.styleSheet().find("#262421") != -1
-        bg_color = "#312e2b" if is_dark else "#f5f5f5"
-        text_color = "#bababa" if is_dark else "#312e2b"
-        border_color = "#3d3a37" if is_dark else "#e1e1e1"
+        bg_color = "#312e2b" if self.is_dark else "#f5f5f5"
+        text_color = "#bababa" if self.is_dark else "#312e2b"
+        border_color = "#3d3a37" if self.is_dark else "#e1e1e1"
 
         html = f"""
         <style>
@@ -177,12 +154,11 @@ class AnalysisWidget(QWidget):
             data = self.analysis_lines[idx]
             score = self.format_score(data, turn=turn)
             pv_moves = data.get("pv", [])
-
+            
             moves_text = ""
             if board:
                 temp_board = board.copy()
                 formatted_moves = []
-                # Only show move numbers for the first move if it's black's turn to move
                 is_first = True
                 for move_uci in pv_moves[:12]:
                     try:
@@ -217,21 +193,69 @@ class AnalysisWidget(QWidget):
 
         self.lines_display.setHtml(html)
 
+    def update_analysis(self, info: dict, board_fen: str = None):
+        """Update analysis lines with new info."""
+        from PyQt5.QtCore import QSettings
+        settings = QSettings("TestChessApp", "Engine")
+        multipv_limit = int(settings.value("multipv", 1))
+
+        self.analysis_lines = {k: v for k, v in self.analysis_lines.items() if k <= multipv_limit}
+
+        multipv = info.get("multipv", 1)
+        if multipv <= multipv_limit:
+            self.analysis_lines[multipv] = info
+        if board_fen:
+            self.last_board_fen = board_fen
+            
+        self.render_html()
+        
         # Update top score if it's the first PV
         if multipv == 1:
+            import chess
+            board = chess.Board(self.last_board_fen) if self.last_board_fen else None
+            turn = board.turn if board else chess.WHITE
             self.set_score(self.format_score(info, raw=True, turn=turn))
+
+    def update_analysis_batch(self, infos: list, board_fen: str = None):
+        """Update multiple analysis lines and render once."""
+        if board_fen:
+            self.last_board_fen = board_fen
+            
+        from PyQt5.QtCore import QSettings
+        settings = QSettings("TestChessApp", "Engine")
+        multipv_limit = int(settings.value("multipv", 1))
+
+        self.analysis_lines = {k: v for k, v in self.analysis_lines.items() if k <= multipv_limit}
+
+        for info in infos:
+            multipv = info.get("multipv", 1)
+            if multipv <= multipv_limit:
+                self.analysis_lines[multipv] = info
+            
+        self.render_html()
+        
+        # Update top score if it's the first PV
+        multipv_1_info = self.analysis_lines.get(1)
+        if multipv_1_info:
+            import chess
+            board = chess.Board(self.last_board_fen) if self.last_board_fen else None
+            turn = board.turn if board else chess.WHITE
+            self.set_score(self.format_score(multipv_1_info, raw=True, turn=turn))
+
+
 
     def reset_lines(self):
         """Clear the current analysis lines data."""
         self.analysis_lines.clear()
         self.lines_display.clear()
+        self.score_label.setText("")
+        self.depth_label.setText("")
 
     def format_score(self, info: dict, raw=False, turn=None) -> str:
         import chess
-
         s_type = info.get("score_type")
         s_val = info.get("score_value", 0)
-
+        
         # UCI engines report scores relative to side-to-move.
         # Normalize to White POV (Positive = White better, Negative = Black better)
         if turn == chess.BLACK:
@@ -251,7 +275,6 @@ class AnalysisWidget(QWidget):
         self.depth_label.setText("depth 0")
         self.lines_display.clear()
         self.analysis_lines.clear()
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -35,11 +35,7 @@ class CommentDialog(QDialog):
         self.accept()
 
 
-class MovesListWidget(QTextBrowser):
-    """
-    Renders the game moves list/history as click-navigable HTML links with variation support.
-    """
-
+class PGNBrowser(QTextBrowser):
     def __init__(self, parent, movemanager: MoveManager):
         super().__init__(parent)
         self.movemanager = movemanager
@@ -47,6 +43,7 @@ class MovesListWidget(QTextBrowser):
         self.setStyleSheet("QTextBrowser {font-size:20px;font-family: Noto Sans;}")
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.on_custom_context)
+        # self.anchorClicked.connect(self.on_anchor_clicked)
 
     def setHtml(self, html: str):
         super().setHtml(html)
@@ -62,20 +59,51 @@ class MovesListWidget(QTextBrowser):
         anchor = self.anchorAt(point)
         if not anchor:
             return
+
+        import qtawesome as qta
+
         menu = QMenu(self)
+        menu.setStyleSheet("""
+            QMenu {
+                background-color: palette(window);
+                color: palette(text);
+                border: 1px solid palette(mid);
+                border-radius: 6px;
+                padding: 4px;
+            }
+            QMenu::item {
+                padding: 6px 24px 6px 12px;
+                margin: 2px;
+                border-radius: 4px;
+            }
+            QMenu::item:selected {
+                background-color: palette(highlight);
+                color: palette(highlighted-text);
+            }
+            QMenu::separator {
+                height: 1px;
+                background-color: palette(mid);
+                margin: 4px 8px;
+            }
+        """)
 
         actions = [
-            ("Promote to Main..", self.on_promote_to_main),
-            ("Promote..", self.on_promote),
-            ("Demote..", self.on_demote),
-            ("Delete from here..", self.on_delete),
-            ("Add Comment..", self.on_add_comment),
+            ("Promote to Main Line", self.on_promote_to_main, "fa5s.arrow-up"),
+            ("Promote Move", self.on_promote, "fa5s.chevron-up"),
+            ("Demote Move", self.on_demote, "fa5s.chevron-down"),
+            ("Delete from Here", self.on_delete, "fa5s.trash-alt"),
+            (None, None, None),  # Separator
+            ("Edit Comment...", self.on_add_comment, "fa5s.comment-alt"),
         ]
 
-        for name, func in actions:
-            act = QAction(name, self)
-            act.triggered.connect(lambda checked, f=func: f(anchor))
-            menu.addAction(act)
+        for name, func, icon_name in actions:
+            if name is None:
+                menu.addSeparator()
+            else:
+                icon = qta.icon(icon_name)
+                act = QAction(icon, name, self)
+                act.triggered.connect(lambda checked, f=func: f(anchor))
+                menu.addAction(act)
 
         menu.exec_(self.mapToGlobal(point))
 
@@ -126,6 +154,6 @@ class MovesListWidget(QTextBrowser):
 
 if __name__ == "__main__":
     app = QApplication([])
-    browser = MovesListWidget(None, MoveManager())
+    browser = PGNBrowser(None, MoveManager())
     browser.show()
     app.exec_()

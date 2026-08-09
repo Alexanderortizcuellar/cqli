@@ -4,17 +4,20 @@ import chess
 import chess.pgn
 from PyQt5.QtCore import QObject, pyqtSignal
 
-from core.pgn_to_html import pgn_to_html
+from core.pgn_to_html import flatten_nodes_pgn_order
 
 
 class MoveManager(QObject):
     pgnChanged = pyqtSignal(str)
+    activeNodeChanged = pyqtSignal()
 
     def __init__(self, pgn_str: str | None = None):
         super().__init__()
         self.html, self.nodes = "", []
         self.html_style = False  # True for dark theme
+        self.font_family = "sans-serif"
         self.game = chess.pgn.Game()
+        self.is_dirty = False
         if pgn_str:
             self.update_pgn(pgn_str)
         self.current_node = self.game
@@ -25,22 +28,49 @@ class MoveManager(QObject):
         self.game.setup(board)
         self.current_node = self.game
         self.create_mapping()
+        self.is_dirty = True
+
+    def cache_node_metadata(self, game_node):
+        """Traverse game tree once and cache san, move_number, and turn on every node."""
+        stack = [(game_node, game_node.board())]
+        while stack:
+            parent_node, board = stack.pop()
+            for var in parent_node.variations:
+                b_copy = board.copy(stack=False)
+                san = b_copy.san(var.move)
+                var.san = san
+                var.move_number = b_copy.fullmove_number
+                var.turn = b_copy.turn
+                b_copy.push(var.move)
+                stack.append((var, b_copy))
 
     def update_pgn(self, pgn_str: str):
         pgn_io = StringIO(pgn_str)
         game = chess.pgn.read_game(pgn_io)
         if game:
             self.game = game
+            self.cache_node_metadata(self.game)
+            self.current_node = self.game
             self.create_mapping()
+            self.is_dirty = True
             return
         self.game = chess.pgn.Game()
+        self.current_node = self.game
         self.create_mapping()
+        self.is_dirty = True
 
     def load_pgn_file(self, filename: str):
-        with open(filename, "r") as f:
-            game = chess.pgn.read_game(f)
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                game = chess.pgn.read_game(f)
+        except UnicodeDecodeError:
+            with open(filename, "r", encoding="latin-1") as f:
+                game = chess.pgn.read_game(f)
         self.game = game
+        self.cache_node_metadata(self.game)
+        self.current_node = self.game
         self.create_mapping()
+        self.is_dirty = False
 
     def make_move(self, move_uci):
         move = chess.Move.from_uci(move_uci)
@@ -51,12 +81,23 @@ class MoveManager(QObject):
                 self.current_node = var
                 return
 
-        # Otherwise, create new variation
+        # Compute SAN while board is active at current position
+        board = self.current_node.board()
+        san = board.san(move)
+        move_number = board.fullmove_number
+        turn = board.turn
+
+        # Otherwise, create new variation and cache SAN
         temp_node = self.current_node.add_variation(move)
+        temp_node.san = san
+        temp_node.move_number = move_number
+        temp_node.turn = turn
+
         self.current_node = temp_node
         if self.current_node.board().result() != "*":
             self.game.headers["Result"] = self.current_node.board().result()
         self.create_mapping()
+        self.is_dirty = True
 
     def undo(self):
         if self.current_node.parent:
@@ -67,8 +108,47 @@ class MoveManager(QObject):
         """Return a list of variations from the current node."""
         variations = {}
         for index, var in enumerate(self.current_node.variations):
-            san = self.current_node.board().san(var.move)
-            variations[index] = {"uci": var.move.uci(), "san": san}
+            board = self.current_node.board()
+            first_move_num = board.fullmove_number
+            first_turn = board.turn
+            first_san = board.san(var.move)
+            
+            if first_turn == chess.WHITE:
+                first_move_formatted = f"{first_move_num}.{first_san}"
+            else:
+                first_move_formatted = f"{first_move_num}...{first_san}"
+                
+            board.push(var.move)
+            
+            continuation_formatted = []
+            temp_node = var
+            moves_shown = 1
+            while moves_shown < 5 and temp_node.variations:
+                next_node = temp_node.variations[0]
+                san = board.san(next_node.move)
+                turn = board.turn
+                move_num = board.fullmove_number
+                
+                if turn == chess.WHITE:
+                    continuation_formatted.append(f"{move_num}.{san}")
+                else:
+                    continuation_formatted.append(san)
+                        
+                board.push(next_node.move)
+                temp_node = next_node
+                moves_shown += 1
+                
+            if continuation_formatted:
+                continuation_str = " ".join(continuation_formatted)
+                line_str = f"{first_move_formatted} {continuation_str}"
+            else:
+                line_str = first_move_formatted
+
+            variations[index] = {
+                "uci": var.move.uci(),
+                "san": first_san,
+                "line": line_str
+            }
         return variations
 
     def get_node_by_index(self, index: int):
@@ -106,26 +186,29 @@ class MoveManager(QObject):
 
     def get_pgn(self):
         from datetime import date
-
+        
         # Update headers if they are default or missing
         if self.game.headers.get("Event", "?") == "?":
             self.game.headers["Event"] = "Chess Analysis"
-
+        
         if self.game.headers.get("Date", "????.??.??") == "????.??.??":
             self.game.headers["Date"] = date.today().strftime("%Y.%m.%d")
-
+            
         return str(self.game)
 
     def create_mapping(self):
-        self.html, self.nodes = pgn_to_html(
-            self.game, self.current_node, self.html_style
-        )
-        self.pgnChanged.emit(self.get_pgn())
+        self.html = ""
+        self.nodes = flatten_nodes_pgn_order(self.game)
+        # Emit empty string to avoid expensive PGN serialization during navigation
+        self.pgnChanged.emit("")
+        self.activeNodeChanged.emit()
+
 
     def add_comment(self, index: int, comment: str):
         node = self.get_node_by_index(index)
         node.comment = comment
         self.create_mapping()
+        self.is_dirty = True
 
     def promote_to_main(self, index: int):
         node = self.get_node_by_index(index)
@@ -133,6 +216,7 @@ class MoveManager(QObject):
         if parent:
             parent.promote_to_main(node)
             self.create_mapping()
+            self.is_dirty = True
 
     def promote(self, index: int):
         node = self.get_node_by_index(index)
@@ -140,6 +224,7 @@ class MoveManager(QObject):
         if parent:
             parent.promote(node)
             self.create_mapping()
+            self.is_dirty = True
 
     def demote(self, index: int):
         node = self.get_node_by_index(index)
@@ -147,6 +232,7 @@ class MoveManager(QObject):
         if parent:
             parent.demote(node)
             self.create_mapping()
+            self.is_dirty = True
 
     def delete_from_here(self, index: int):
         node = self.get_node_by_index(index)
@@ -161,11 +247,12 @@ class MoveManager(QObject):
                     is_parent = True
                     break
                 temp = temp.parent
-
+            
             if is_parent:
                 self.current_node = parent
-
+                
             self.create_mapping()
+            self.is_dirty = True
 
     def change_html_style(self, html_style=False):
         self.html_style = html_style
@@ -175,3 +262,4 @@ class MoveManager(QObject):
         self.game = chess.pgn.Game()
         self.current_node = self.game
         self.create_mapping()
+        self.is_dirty = False

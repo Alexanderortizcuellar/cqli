@@ -13,61 +13,50 @@ def flatten_nodes_pgn_order(
 
     If `annotate_index` is True, attaches `node.flat_index = i` to each node.
     """
+    out = []
+    
+    if not game.variations:
+        return []
+        
+    class Frame:
+        def __init__(self, node, sidelines=True):
+            self.node = node
+            self.state = "pre"
+            self.variations = iter(node.parent.variations[1:]) if sidelines else iter([])
 
-    class _Collector(chess.pgn.BaseVisitor[None]):
-        def __init__(self, root: chess.pgn.Game):
-            self.root = root
-            # Stack tracks the "current position node" as accept() walks the tree
-            # (same idea as GameBuilder.variation_stack).
-            self.stack: List[chess.pgn.GameNode] = []
-            self.out: List[chess.pgn.GameNode] = []
-
-        def begin_game(self) -> None:
-            self.stack = [self.root]
-
-        def begin_variation(self) -> None:
-            # python-chess jumps back to the branch point (parent of current node)
-            # before descending into a side variation.
-            parent = self.stack[-1].parent
-            assert parent is not None, "begin_variation at root is invalid"
-            self.stack.append(parent)
-
-        def end_variation(self) -> None:
-            self.stack.pop()
-
-        def visit_move(self, board: chess.Board, move: chess.Move) -> None:
-            # Current parent position:
-            parent = self.stack[-1]
-
-            # Find the child node under `parent` that corresponds to `move`.
-            # Use both object equality and UCI as a robust fallback.
-            found: Optional[chess.pgn.GameNode] = None
-            u = move.uci()
-            for child in parent.variations:
-                if child.move == move or child.move.uci() == u:
-                    found = child
-                    break
-
-            if found is None:
-                # This should not happen unless the tree is inconsistent.
-                raise RuntimeError("Could not map visitor move to a tree node.")
-
-            # Record node in PGN order and advance the stack to that node.
-            self.out.append(found)
-            self.stack[-1] = found
-
-        def result(self) -> None:
-            # We don't need to return anything here; we'll read self.out.
-            return None
-
-    collector = _Collector(game)
-    game.accept(collector)
-
+    stack = [Frame(game.variations[0], sidelines=True)]
+    
+    while stack:
+        top = stack[-1]
+        
+        if top.state == "pre":
+            if top.node.move is not None:
+                out.append(top.node)
+            top.state = "variations"
+            
+        elif top.state == "variations":
+            try:
+                variation = next(top.variations)
+            except StopIteration:
+                if top.node.variations:
+                    stack.append(Frame(top.node.variations[0], sidelines=True))
+                    top.state = "post"
+                else:
+                    top.state = "end"
+            else:
+                stack.append(Frame(variation, sidelines=False))
+                
+        elif top.state == "post":
+            top.state = "end"
+            
+        else:
+            stack.pop()
+            
     if annotate_index:
-        for i, n in enumerate(collector.out):
-            setattr(n, "flat_index", i)  # attach a handy index for later use
-
-    return collector.out
+        for i, n in enumerate(out):
+            n.flat_index = i
+            
+    return out
 
 
 class HtmlExporterMixin:
@@ -81,12 +70,18 @@ class HtmlExporterMixin:
         comments: bool = True,
         variations: bool = True,
         highlight_index: Optional[int] = None,
+        font_family: str = "sans-serif",
+        nodes: Optional[List[chess.pgn.GameNode]] = None,
+        show_classifications: bool = True,
     ):
         self.columns = columns
         self.headers = headers
         self.comments = comments
         self.variations = variations
         self.highlight_index = highlight_index
+        self.font_family = font_family
+        self.nodes = nodes
+        self.show_classifications = show_classifications
 
         self.force_movenumber = True
         self.variation_depth = 0
@@ -164,10 +159,36 @@ class HtmlExporterMixin:
             # use current index as ID and href
             is_highlighted = self.move_index == self.highlight_index
             highlight_class = " highlight" if is_highlighted else ""
+            
+            import re
+            node_cls = None
+            if self.nodes and self.move_index < len(self.nodes):
+                node = self.nodes[self.move_index]
+                if node.comment:
+                    alz_match = re.search(r'\[%alz\s+([^\]]+)\]', node.comment)
+                    if alz_match:
+                        cls_tokens = alz_match.group(1).split()
+                        for token in cls_tokens:
+                            if token.startswith("cls="):
+                                try:
+                                    node_cls = int(token.split("=")[1])
+                                except ValueError:
+                                    pass
+
+            CLS_CLASS_MAP = {
+                4: "cls-inaccuracy",
+                5: "cls-mistake",
+                6: "cls-blunder",
+                7: "cls-brilliant",
+                8: "cls-miss",
+            }
+            cls_class = ""
+            if self.show_classifications and node_cls in CLS_CLASS_MAP:
+                cls_class = f" {CLS_CLASS_MAP[node_cls]}"
 
             move_html = (
                 f'<span class="move">'
-                f'{prefix}<a id="m{self.move_index}" href="move({self.move_index})" class="mv{highlight_class}">{san}</a>'
+                f'{prefix}<a id="m{self.move_index}" href="move({self.move_index})" class="mv{highlight_class}{cls_class}">{san}</a>'
                 f"</span>"
             )
             self.parts.append(move_html)
@@ -184,33 +205,45 @@ class HtmlExporterMixin:
 
 class HtmlExporter(HtmlExporterMixin, chess.pgn.BaseVisitor[str]):
     def result(self) -> str:
-        light_style = """
+        light_style = f"""
         <style>
-        .move {display: inline; }
-            .num { color: #757575; font-weight: bold; margin-right: 2px; }
-            .mv { color: #1A1A1A; text-decoration: none; padding: 4px 2px; }
-            .mv:hover { background: #eef6ff; }
-            .mv.highlight { background: #FFF59D; color: #000; }
-            .cmt { color: #388E3C; font-style: italic; margin-left: 4px; }
-            .variation { color: #9aa0a6; }
-            .hdr { color: #555; font-family: monospace; }
-            .res { font-weight: bold; }
+            body {{ font-family: 'Segoe UI', Arial, sans-serif; font-size: 20px; }}
+            .move {{display: inline; }}
+            .num {{ color: #757575; font-weight: bold; margin-right: 2px; }}
+            .mv {{ font-family: {self.font_family}; color: #1A1A1A; text-decoration: none; padding: 4px 2px; }}
+            .mv:hover {{ background: #eef6ff; }}
+            .mv.highlight {{ background: #dbeafe; }}
+            .mv.cls-inaccuracy {{ color: #b58900; }}
+            .mv.cls-mistake {{ color: #e65100; }}
+            .mv.cls-blunder {{ color: #b71c1c; font-weight: bold; }}
+            .mv.cls-brilliant {{ color: #28c2a4; font-weight: bold; }}
+            .mv.cls-miss {{ color: #d32f2f; }}
+            .cmt {{ color: #388E3C; font-style: italic; margin-left: 4px; }}
+            .variation {{ color: #9aa0a6; }}
+            .hdr {{ color: #555; font-family: monospace; }}
+            .res {{ font-weight: bold; }}
         </style>
         """
-        dark_style = """
+        dark_style = f"""
             <style>
-                body { background-color: #121212; color: #E0E0E0; font-family: sans-serif; line-height: 1.6; }
-                .move { display: inline; }
-                .num { color: #9E9E9E; font-weight: bold; margin-right: 2px; }
-                .mv { color: #BB86FC; text-decoration: none; padding: 4px 2px; }
-                .mv:hover { background: #2A2A2A; }
-                .mv.highlight { background: #4DB6AC; color: #000; }
-                .cmt { color: #03DAC6; font-style: italic; margin-left: 4px; }
-                .variation { color: #B0BEC5; font-style: italic; }
-                .hdr { color: #8D99AE; font-family: monospace; }
-                .res { color: #FFB74D; font-weight: bold; }
+                body {{ background-color: #121212; color: #E0E0E0; font-family: 'Segoe UI', Arial, sans-serif; font-size: 20px; line-height: 1.6; }}
+                .move {{ display: inline; }}
+                .num {{ color: #9E9E9E; font-weight: bold; margin-right: 2px; }}
+                .mv {{ font-family: {self.font_family}; color: #BB86FC; text-decoration: none; padding: 4px 2px; }}
+                .mv:hover {{ background: #2A2A2A; }}
+                .mv.highlight {{ background: #1a365d; }}
+                .mv.cls-inaccuracy {{ color: #ffd54f; }}
+                .mv.cls-mistake {{ color: #ffa726; }}
+                .mv.cls-blunder {{ color: #ff5252; font-weight: bold; }}
+                .mv.cls-brilliant {{ color: #28c2a4; font-weight: bold; }}
+                .mv.cls-miss {{ color: #ff8a80; }}
+                .cmt {{ color: #03DAC6; font-style: italic; margin-left: 4px; }}
+                .variation {{ color: #B0BEC5; font-style: italic; }}
+                .hdr {{ color: #8D99AE; font-family: monospace; }}
+                .res {{ color: #FFB74D; font-weight: bold; }}
             </style>
             """
+
 
         style = dark_style if self.dark_mode else light_style
         return style + "<div class='moves'>" + " ".join(self.parts) + "</div>"
@@ -222,19 +255,14 @@ class HtmlExporter(HtmlExporterMixin, chess.pgn.BaseVisitor[str]):
         self.dark_mode = is_dark_style
 
 
-def pgn_to_html(
-    game: chess.pgn.Game,
-    highlight_node: Optional[chess.pgn.GameNode] = None,
-    style: bool = False,
-):
+def pgn_to_html(game: chess.pgn.Game, highlight_node: Optional[chess.pgn.GameNode] = None, style: bool = False, font_family: str = "sans-serif", show_classifications: bool = True):
     nodes = flatten_nodes_pgn_order(game)
     highlight_index = None
     if highlight_node is not None:
         highlight_index = getattr(highlight_node, "flat_index", None)
-
-    exporter = HtmlExporter(
-        variations=True, comments=True, headers=False, highlight_index=highlight_index
-    )
+        
+    exporter = HtmlExporter(variations=True, comments=True, headers=False, highlight_index=highlight_index, font_family=font_family, nodes=nodes, show_classifications=show_classifications)
     exporter.set_style(style)
     data = game.accept(exporter)
     return data, nodes
+
