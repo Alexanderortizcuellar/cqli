@@ -2,116 +2,1927 @@
     {
         "name": "Nh6Mate",
         "description": "Checks for a Knight checkmate delivered from h6 with Black to move.",
-        "query": "cql()\nbtm\nB[a1,b2,c3,d4,e5]\nNh6 attacks k\nmate"
+        "query": "cql()\nbtm\nB[a1,b2,c3,d4,e5]\nNh6 attacks k\nmate",
+        "category": "Custom / User"
     },
     {
         "name": "PromotionQStalemate",
         "description": "Searches for a pawn promotion to a Queen that immediately results in a stalemate.",
-        "query": "cql()\nmove promote [Qq]\nstalemate"
+        "query": "cql()\nmove promote [Qq]\nstalemate",
+        "category": "Custom / User"
     },
     {
         "name": "smotheredmateWhite",
         "description": "Finds checkmates against the Black King where it is completely smothered by its own pieces (0 empty adjacent squares).",
-        "query": "cql()\nbtm\n_ attackedby k == 0\nmate"
+        "query": "cql()\nbtm\n_ attackedby k == 0\nmate",
+        "category": "Custom / User"
     },
     {
         "name": "smotheredmateBlack",
         "description": "Finds checkmates against the White King where it is completely smothered by its own pieces (0 empty adjacent squares).",
-        "query": "cql()\nwtm\n_ attackedby K == 0\nmate"
+        "query": "cql()\nwtm\n_ attackedby K == 0\nmate",
+        "category": "Custom / User"
     },
     {
         "name": "QsacrificeMate",
         "description": "A Queen sacrifice check, accepted by the King, followed by checkmate delivered by any White piece.",
-        "query": "cql()\nline --> {\n  move from Q capture a check\n  move from k capture Q\n  move from A mate\n}"
+        "query": "cql()\nline --> {\n  move from Q capture a check\n  move from k capture Q\n  move from A mate\n}",
+        "category": "Custom / User"
     },
     {
         "name": "RookxNightcheckFork",
         "description": "Rook captures Knight with check, followed by King captures Rook, followed by Knight fork check capturing the opponent's Rook.",
-        "query": "cql()\nline --> {\n  move from R capture n check\n  move from k capture R\n  move from N check\n  move from k\n  move from N capture r\n}"
+        "query": "cql()\nline --> {\n  move from R capture n check\n  move from k capture R\n  move from N check\n  move from k\n  move from N capture r\n}",
+        "category": "Custom / User"
     },
     {
         "name": "alapinwhitewin",
         "description": "Matches games where White wins from the Alapin variation of the Sicilian Defense.",
-        "query": "cql()\nfen \"rnbqkbnr/pp1ppppp/8/2p5/4P3/2P5/PP1P1PPP/RNBQKBNR\"\nresult 1-0"
+        "query": "cql()\nfen \"rnbqkbnr/pp1ppppp/8/2p5/4P3/2P5/PP1P1PPP/RNBQKBNR\"\nresult 1-0",
+        "category": "Custom / User"
     },
     {
         "name": "alekhineGambit",
         "description": "Alekhine Defense Gambit sequence played by White (Alexander2magnus) leading to a win.",
-        "query": "cql()\nplayer white \"Alexander2magnus\"\nresult 1-0\nline --> {\n  move from P to e4\n  move from n to f6\n  move from P to e5\n  move from n to d5\n  move from [Aa] check\n  move from a5 to b6 capture n\n}"
+        "query": "cql()\nplayer white \"Alexander2magnus\"\nresult 1-0\nline --> {\n  move from P to e4\n  move from n to f6\n  move from P to e5\n  move from n to d5\n  move from [Aa] check\n  move from a5 to b6 capture n\n}",
+        "category": "Custom / User"
     },
     {
         "name": "italianWin",
         "description": "Matches games where White (Alexander2magnus) wins from the Italian Game starting position.",
-        "query": "cql()\nplayer white \"Alexander2magnus\"\nresult 1-0\nfen \"r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3\""
+        "query": "cql()\nplayer white \"Alexander2magnus\"\nresult 1-0\nfen \"r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3\"",
+        "category": "Custom / User"
     },
     {
         "name": "againstDani",
         "description": "White win by Alexander2magnus from the Italian Game against player danielgg12.",
-        "query": "cql()\nplayer white \"Alexander2magnus\"\nplayer black \"danielgg12\"\nresult 1-0\nfen \"r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3\""
+        "query": "cql()\nplayer white \"Alexander2magnus\"\nplayer black \"danielgg12\"\nresult 1-0\nfen \"r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3\"",
+        "category": "Custom / User"
     },
     {
         "name": "b4tTrap",
         "query": "cql()\nplayer white \"Alexander2magnus\"\nresult 1-0\nBc4\nbc5\nline --> {\n  move from P to a4\n  move from a\n  move from P to b4\n}",
-        "description": "Pawn push sequence a4/b4 trapping Black's bishop on c5."
+        "description": "Pawn push sequence a4/b4 trapping Black's bishop on c5.",
+        "category": "Custom / User"
     },
     {
         "name": "knightForkQK",
         "description": "Searches for a Knight check fork that targets both the King and Queen (matches either color).",
-        "query": "cql()\nflipcolor piece Knight in N {\n  (Knight attacks [qk]) > 1\n}"
+        "query": "cql()\nflipcolor piece Knight in N {\n  (Knight attacks [qk]) > 1\n}",
+        "category": "Custom / User"
     },
     {
         "name": "karoQxb3",
         "description": "Black Queen captures a White piece on b3 in the Caro-Kann Defense.",
-        "query": "cql()\nfen \"rnbqkbnr/pp2pppp/8/3p4/3P4/3B4/PPP2PPP/RNBQK1NR\"\nmove from q to b3 capture A"
+        "query": "cql()\nfen \"rnbqkbnr/pp2pppp/8/3p4/3P4/3B4/PPP2PPP/RNBQK1NR\"\nmove from q to b3 capture A",
+        "category": "Custom / User"
     },
     {
         "name": "ItalianBc5-d6-d4",
         "description": "Italian Game opening sequence with Bc5, c3, d6, and d4.",
-        "query": "cql()\nplayer white \"Alexander2magnus\"\nfen \"r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3\"\nline --> {\n  move from b to c5\n  move from P to c3\n  move from p to d6\n  move from P to d4\n}"
+        "query": "cql()\nplayer white \"Alexander2magnus\"\nfen \"r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3\"\nline --> {\n  move from b to c5\n  move from P to c3\n  move from p to d6\n  move from P to d4\n}",
+        "category": "Custom / User"
     },
     {
         "name": "london",
         "description": "London System opening position played by Black (Alexander2magnus).",
-        "query": "cql()\nplayer black \"Alexander2magnus\"\nfen \"rnbqkb1r/pp3ppp/4pn2/2pp4/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 0 5\""
+        "query": "cql()\nplayer black \"Alexander2magnus\"\nfen \"rnbqkb1r/pp3ppp/4pn2/2pp4/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 0 5\"",
+        "category": "Custom / User"
     },
     {
         "name": "mateDespiteMaterialDeficit",
         "description": "Finds checkmates delivered despite a material deficit of 8 points or more.",
-        "query": "cql()\nflipcolor {\n  player white \"Alexander2magnus\"\n  btm\n  mate\n  power a - power A >= 8\n  comment \"Checkmate despite material deficit\"\n}"
+        "query": "cql()\nflipcolor {\n  player white \"Alexander2magnus\"\n  btm\n  mate\n  power a - power A >= 8\n  comment \"Checkmate despite material deficit\"\n}",
+        "category": "Custom / User"
     },
     {
         "name": "GreekGiftAccepted",
         "description": "The classic Bxh7 greek gift.",
-        "query": "cql()\nresult 1-0\nline --> move from B to p capture h7\n     --> check\n     --> move previous from k to h7 capture B\n     --> move previous from N to g5"
+        "query": "cql()\nresult 1-0\nline --> move from B to p capture h7\n     --> check\n     --> move previous from k to h7 capture B\n     --> move previous from N to g5",
+        "category": "Custom / User"
     },
     {
         "name": "QmateInh7h2",
         "description": "finnds mates when Q was in h7/h2 and kig on g8/g1",
-        "query": "flipcolor {\n   player white \"Alexander2magnus\"\n   result 1-0\nmate\nQh7\nkg8\n}\n"
+        "query": "flipcolor {\n   player white \"Alexander2magnus\"\n   result 1-0\nmate\nQh7\nkg8\n}\n",
+        "category": "Custom / User"
     },
     {
         "name": "MateWithPawn",
         "description": "mate delivered by a pawn",
-        "query": "cql()\nmate\nmove previous from [Pp]\n"
+        "query": "cql()\nmate\nmove previous from [Pp]\n",
+        "category": "Custom / User"
     },
     {
         "name": "HowManyMatesIn1",
         "description": "possible mates in 1 in a position",
-        "query": "move count legal : mate > 5"
+        "query": "move count legal : mate > 5",
+        "category": "Custom / User"
     },
     {
         "name": "xrayWithB-QR",
         "description": "xray with bishop a king to a q or r",
-        "query": "// cql()\n// piece $night = N\n// [kb] attackedby $night >1 and not $night attacked by a\n\nflipcolor {\nxray(B k [qr])\nmove from k to _\n}\n"
+        "query": "// cql()\n// piece $night = N\n// [kb] attackedby $night >1 and not $night attacked by a\n\nflipcolor {\nxray(B k [qr])\nmove from k to _\n}\n",
+        "category": "Custom / User"
     },
     {
         "name": "NForksQK",
         "description": "a Night forks a king and queen",
-        "query": "cql()\n\nflipcolor {\npiece $night = N\n[kq] attackedby $night >1 and not $night attacked by a\n}"
+        "query": "cql()\n\nflipcolor {\npiece $night = N\n[kq] attackedby $night >1 and not $night attacked by a\n}",
+        "category": "Custom / User"
     },
     {
         "name": "NForksUndefendedBK",
         "description": "Night forks an undefended bishop and a king",
-        "query": "cql()\nflipcolor {\npiece $night = N\n[kb] attackedby $night >1 and not $night attacked by a\nand not b attackedby a\n}"
+        "query": "cql()\nflipcolor {\npiece $night = N\n[kb] attackedby $night >1 and not $night attacked by a\nand not b attackedby a\n}",
+        "category": "Custom / User"
+    },
+    {
+        "name": "Nxe5Trap",
+        "description": "opponent moves their night to e5 while pinning with bishop on g4 and boom Queen sacrifice",
+        "query": "bg4\nne5\n\nline --> move from N capture ne5 \n     --> move from b capture Q",
+        "category": "Custom / User"
+    },
+    {
+        "name": "getEval",
+        "description": "get the eval comment of current position",
+        "query": "function geteval() {\n    if originalcomment ~~ \".*\\[%eval ([^\\]]+)\\].*\" {\n        comment(\\1)\n    }\n}\n\n",
+        "category": "Custom / User"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "01_05P",
+        "description": "endings 1-5: king + pawn vs king.",
+        "query": "// endings 1-5: king + pawn vs king.\n\ncql()\n\nflipcolor (P == 1)\n\n[Aa] == 3"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "06_07RB",
+        "description": "endings 6-7 : Rook vs bishop",
+        "query": "// endings 6-7 : Rook vs bishop\n\ncql()\n\nflipcolor (R == 1 and b == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "08_09Rn",
+        "description": "endings 8 - 9: rook vs knight",
+        "query": "// endings 8 - 9: rook vs knight\n\ncql()\n\nflipcolor (R == 1 and n == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "100Qrp",
+        "description": "ending 100 : Q vs R and rook's pawn",
+        "query": "// ending 100 : Q vs R and rook's pawn\n\ncql()\n\nflipcolor flip (Q == 1 and r == 1 and p[a2] == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "10Np",
+        "description": "ending 10: knight vs 7-th rank pawn",
+        "query": "// ending 10: knight vs 7-th rank pawn\n\ncql()\n\nflipcolor flipvertical (N == 1 and p[a2] == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "10_15Np",
+        "description": "endings 10-15: knight vs pawn",
+        "query": "// endings 10-15: knight vs pawn\n\ncql()\n\nflipcolor (N == 1 and p == 1)\n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "11Np",
+        "description": "ending 11: knight vs knights pawn",
+        "query": "// ending 11: knight vs knights pawn\n\ncql()\n\nflipcolor flipvertical (N == 1 and p[b2] == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "12Np",
+        "description": "ending 12: knight 6th rank rook's pawn",
+        "query": "// ending 12: knight 6th rank rook's pawn\n\ncql()\n\nflipcolor flipvertical (N == 1 and p[a6] == 1)\n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "16_19Qp",
+        "description": "endings 16-19: Queen vs 7th rank pawn",
+        "query": "// endings 16-19: Queen vs 7th rank pawn\n\ncql()\n\nflipcolor (Q == 1 and p[a-h2] == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "20Qq",
+        "description": "endings 20: Queen vs queen",
+        "query": "// endings 20: Queen vs queen\n\ncql()\n\nflipcolor (Q == 1 and q == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "21_29Rp",
+        "description": "endings 21 - 29: R vs p",
+        "query": "// endings 21 - 29: R vs p\n\ncql()\n\nflipcolor (R == 1 and p == 1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "30_32Rpp",
+        "description": "endings 30 - 32: Rook vs. two connected pawns. is the fact that the pawns are connected important?",
+        "query": "// endings 30 - 32: Rook vs. two connected pawns.\n// is the fact that the pawns are connected important?\n\ncql()\n\nflipcolor (R == 1 and  p == 2 and connectedpawns == 2) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "33_36BPb",
+        "description": "endings 33 - 36: same coloured bishops B + P vs b.",
+        "query": "// endings 33 - 36: same coloured bishops B + P vs b.\n\ncql()\n\nB == 1 and b == 1 and light [Bb] == 1 and dark [Bb] == 1\n\n[QqRrNn] == 0\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "37_40BNP",
+        "description": "endings 37 - 40: Bishop and Knight ending with one pawn.",
+        "query": "// endings 37 - 40: Bishop and Knight ending with one pawn.\n\ncql()\n\nflipcolor (B == 1 and n == 1 and [Pp] == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "41_51ocBPPb",
+        "description": "ending 41: Opposite colour bishops",
+        "query": "// ending 41: Opposite colour bishops\n\ncql()\n\n// white light squared bishop and black dark squared bishop\n\n(light B == 1 and\n dark B == 0 and\n dark b == 1 and\n light b == 0 and\n P[a-h6] == 2 and\n connectedpawns == 2 and\n p == 0)\n\nor\n\n// white dark squared bishop and black light squared bishop\n\n(dark B == 1 and\n light B == 0 and\n light b == 1 and\n dark b == 0 and\n P == 0 and\n connectedpawns == 2 and\n p[a-h3] == 2)\n\n[Aa] == 6"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "42_43ocBPPb",
+        "description": "ending 42 - 43: Opposite colour bishops",
+        "query": "// ending 42 - 43: Opposite colour bishops\n\ncql()\n\n// white light squared bishop and black dark squared bishop\n\nflipcolor(light B == 1 and\n dark B == 0 and\n dark b == 1 and\n light b == 0 and\n P[a-h5] == 2 and\n connectedpawns == 2 and \n p == 0)\n\n[Aa] == 6"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "44_51ocBPPb",
+        "description": "ending 44-51: Opposite colour bishops",
+        "query": "// ending 44-51: Opposite colour bishops\n\ncql()\n\n// white light squared bishop and black dark squared bishop or white dark squared bishop and black light squared bishop\n\nflipcolor(light B == 1 and\n dark B == 0 and\n dark b == 1 and\n light b == 0 and\n P == 2 and\n isolatedpawns == 2 and \n p == 0)\n\n[Aa] == 6"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "52_68RPr",
+        "description": "endings 52 - 68: rook + pawn vs rook",
+        "query": "// endings 52 - 68: rook + pawn vs rook\n\ncql()\n\nflipcolor (R == 1 and P == 1 and r == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "55RPr",
+        "description": "ending 55 R and b/g pawn (5th rank or further)",
+        "query": "// ending 55 R and b/g pawn (5th rank or further)\n\ncql()\n\nflipcolor flip (R == 1 and P[b5-7] == 1 and r == 1) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "56RPr",
+        "description": "ending 56 : rook and pawn (c,d,e,f)",
+        "query": "// ending 56 : rook and pawn (c,d,e,f)\n\ncql()\n\nflipcolor flip (R == 1 and P[c-d5-7] == 1 and r == 1) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "57_58RPr",
+        "description": "ending 57",
+        "query": "// ending 57\n\ncql()\n\nflipcolor flipvertical (R == 1 and r == 1 and P[d6] == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "65_68RPr",
+        "description": "ending 65 - 68: rook + rooks pawn vs rook",
+        "query": "// ending 65 - 68: rook + rooks pawn vs rook\n\ncql()\n\nflipcolor flipvertical (R == 1 and r == 1 and P[a2-7] == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "69_76RPPr",
+        "description": "ending 69 - 76: rook + 2 pawns vs rook",
+        "query": "// ending 69 - 76: rook + 2 pawns vs rook\n\ncql()\n\nflipcolor (R == 1 and P == 2 and r == 1)\n\n[Aa] == 6"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "77PP",
+        "description": "ending 77 : doubled pawns",
+        "query": "// ending 77 : doubled pawns\n\ncql()\n\nflipcolor (P == 2 and p == 0 and doubledpawns == 2 ) \n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "78PP",
+        "description": "ending 78: isolated pawns",
+        "query": "// ending 78: isolated pawns\n\ncql()\n\nflipcolor (P == 2 and isolatedpawns == 2)\n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "79_81Pp",
+        "description": "endings 79 - 81: one pawn each (no passed pawns)",
+        "query": "// endings 79 - 81: one pawn each (no passed pawns)\n\ncql()\n\n(P == 1 and p == 1 and passedpawns == 0)\n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "82Pp",
+        "description": "endings 82: one pawn each (one passed pawn each)",
+        "query": "// endings 82: one pawn each (one passed pawn each)\n\ncql()\n\n(P == 1 and p == 1 and passedpawns == 2)\n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "83_86PPp",
+        "description": "endings 83 - 86: two pawns vs one (one pair of rooks pawns and one passed pawn)",
+        "query": "// endings 83 - 86: two pawns vs one (one pair of rooks pawns and one passed pawn)\n\ncql()\n\nflipcolor flipvertical (P == 2 and p == 1 and passedpawns == 1 and Pa2-7 and pa2-7) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "87PPp",
+        "description": "ending 87: knight and rooks pawn against rooks pawn",
+        "query": "// ending 87: knight and rooks pawn against rooks pawn\n\ncql()\n\nflipcolor flipvertical (P[g-h2-7] == 2 and p[h2-7] == 1) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "88PPp",
+        "description": "ending 88: king vs 2 passed pawns",
+        "query": "// ending 88: king vs 2 passed pawns\n\ncql()\n\nflipcolor (P == 2 and p == 1) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "93BN",
+        "description": "ending 93 : bishop and knight mate",
+        "query": "// ending 93 : bishop and knight mate\n\ncql()\n\nflipcolor (B == 1 and N == 1)\n\n[Aa] == 4"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "94_96RBr",
+        "description": "ending 94 - 96: rook + bishop vs rook",
+        "query": "// ending 94 - 96: rook + bishop vs rook\n\n\ncql()\n\nflipcolor (R == 1 and B == 1 and r == 1) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "97RPb",
+        "description": "ending 97 : rook + 6th rank bishop pawn",
+        "query": "// ending 97 : rook + 6th rank bishop pawn\n\n\ncql()\n\nflipcolor flip (R == 1 and P[a-h6] == 1 and b == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "98RPb",
+        "description": "ending 98 : rook + rook's pawn vs bishop",
+        "query": "// ending 98 : rook + rook's pawn vs bishop\n\n\ncql()\n\nflipcolor flip (R == 1 and P[a2-7] == 1 and b == 1) \n\n[Aa] == 5"
+    },
+    {
+        "category": "100 Endgames You Must Know",
+        "name": "99Qrp",
+        "description": "ending 99 : Q vs R and b-g pawn",
+        "query": "// ending 99 : Q vs R and b-g pawn\n\ncql()\n\nflipcolor flip (Q == 1 and r == 1 and p[b-g2-7] == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "1-1Q",
+        "description": "Queen vs. King",
+        "query": "// Queen vs. King\n\ncql()\n\nflipcolor (Q == 1)\n\n[Aa] == 3"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "1-2R",
+        "description": "Rook vs. King",
+        "query": "// Rook vs. King\n\ncql()\n\nflipcolor (R == 1)\n\n[Aa] == 3"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "1-3BB",
+        "description": "Two Bishops vs. King",
+        "query": "// Two Bishops vs. King\n\ncql()\n\nflipcolor (B == 2)\n\n[Aa] == 4"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "1-5NNp",
+        "description": "Two knights vs pawn (troitsky line)",
+        "query": "// Two knights vs pawn (troitsky line)\n\ncql()\n\nflipcolor (N == 2 and p == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "10-2Qr",
+        "description": "Queen vs. Rook (without pawns)",
+        "query": "// Queen vs. Rook (without pawns)\n\ncql()\n\nflipcolor (Q == 1 and r == 1 and [qRBbNnPp] == 0)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "10-7-1Qbrr",
+        "description": "Queen and Bishop vs. Two Rooks (without pawns)",
+        "query": "// Queen and Bishop vs. Two Rooks (without pawns)\n\ncql()\n\nflipcolor (Q == 1 and B == 1 and r == 2 and [qRbNnPp] == 0)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "10-8",
+        "description": "10.8: queen + minor piece vs queen + minor piece",
+        "query": "// 10.8: queen + minor piece vs queen + minor piece\n\n  cql()\n\n  flipcolor (Q == 1 and [BN] == 1 and [Rr] == 0 and q == 1 and [bn] == 1)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "2-1Pp",
+        "description": "2.1 Small number of pawns",
+        "query": "// 2.1 Small number of pawns\n\ncql()\n\nP <= 2 and p <= 2 and [QqRrBbNn] == 0"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "5-3-ABBnn",
+        "description": "Two bishop vs two knights",
+        "query": "// Two bishop vs two knights\n\ncql()\n\nflipcolor (B == 2 and n == 2 and [QqRrbNn] == 0)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "5-3-BBBbn",
+        "description": "Two bishop vs two knights",
+        "query": "// Two bishop vs two knights\n\ncql()\n\nflipcolor (B == 2 and n == 1 and b == 1 and [QqRrbNn] == 0)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "6-1-DRPp",
+        "description": "rook and pawns vs pawns",
+        "query": "// rook and pawns vs pawns\n\ncql()\n\nflipcolor (R == 1 and P >= 1 and p >= 1 and [QqrBbNn] == 0)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "7-3Rbn",
+        "description": "Rook vs. Knight and Bishop",
+        "query": "// Rook vs. Knight and Bishop\n\ncql()\n\nflipcolor (R == 1 and b == 1 and n == 1 and [QqrBN] == 0)"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "8-1RNr",
+        "description": "Rook and knight vs rook without pawns",
+        "query": "// Rook and knight vs rook without pawns\n\ncql()\n\nflipcolor (R == 1 and N == 1 and r == 1 and n == 0) \n\n[QqBbPp] == 0"
+    },
+    {
+        "category": "Fundamental Chess Endings (FCE)",
+        "name": "8-2RBr",
+        "description": "Rook and bishop vs rook (without pawns)",
+        "query": "// Rook and bishop vs rook (without pawns)\n\ncql()\n\nflipcolor (R == 1 and B == 1 and r == 1 and [QqbNnPp] == 0)"
+    },
+    {
+        "category": "combined",
+        "name": "fce-table-markers",
+        "description": "Generated by scripts/build_fce_combined_marker_cql.py. Run this single script against a PGN directory to get one annotated PGN per input PGN. Marker comments are written as {<stem>}.",
+        "query": "// Generated by scripts/build_fce_combined_marker_cql.py.\n// Run this single script against a PGN directory to get one annotated PGN per input PGN.\n// Marker comments are written as {<stem>}.\n\ncql(quiet)\n\n{\n    {\n        // 1-4BN: Bishop + Knight vs King (canonical)\n        flipcolor (N == 1 and B == 1)\n\n        [Aa] == 4\n        comment(\"1-4BN\")\n    }\n    or\n    {\n        // 1-5NNp: Two Knights vs Pawn (canonical)\n        flipcolor (N == 2 and p == 1)\n\n        [Aa] == 5\n        comment(\"1-5NNp\")\n    }\n    or\n    {\n        // 2-1P: King + Pawn vs King (canonical; also marks 2-0Pp)\n        flipcolor (P == 1)\n\n        [Aa] == 3\n        comment(\"2-1P\")\n        comment(\"2-0Pp\")\n    }\n    or\n    {\n        // 2-0Pp: Pawn Endings (canonical)\n        [Pp] >= 1 and [QqRrBbNn] == 0\n        comment(\"2-0Pp\")\n    }\n    or\n    {\n        // 3-1Np: Knight vs Pawns (canonical)\n        flipcolor (N == 1 and p >= 1 and [QqRrBbn] == 0)\n        comment(\"3-1Np\")\n    }\n    or\n    {\n        // 3-2NN: Knight vs Knight (canonical)\n        (N == 1 and n == 1 and [QqRrBb] == 0)\n        comment(\"3-2NN\")\n    }\n    or\n    {\n        // 4-1Bp: Bishop vs Pawns (canonical)\n        flipcolor (B == 1 and p >= 1 and [QqRrbNn] == 0)\n        comment(\"4-1Bp\")\n    }\n    or\n    {\n        // 4-2scBB: Bishop vs Bishop (Same Colour) (canonical)\n        B == 1 and b == 1 and flipvertical (light [Bb] == 2)\n\n        [QqRrNn] == 0\n        comment(\"4-2scBB\")\n    }\n    or\n    {\n        // 4-3ocBB: Bishop vs Bishop (Opposite Colour) (canonical)\n        B == 1 and b == 1 and light [Bb] == 1 and dark [Bb] == 1\n\n        [QqRrNn] == 0\n        comment(\"4-3ocBB\")\n    }\n    or\n    {\n        // 5-0BN: Bishop vs Knight (canonical)\n        flipcolor (B == 1 and n == 1 and [bNQqRr] == 0)\n        comment(\"5-0BN\")\n    }\n    or\n    {\n        // 6-1-0RP: Rook vs Pawns (canonical)\n        flipcolor (R == 1 and p >= 1 and [QqrBbNnP] == 0)\n        comment(\"6-1-0RP\")\n    }\n    or\n    {\n        // 6-2-1RPr: Rook + Pawn vs Rook (canonical)\n        flipcolor (R == 1 and P == 1 and r == 1)\n\n        [Aa] == 5\n        comment(\"6-2-1RPr\")\n    }\n    or\n    {\n        // 6-2-2RPPrConnected: Rook + Two Pawns vs Rook (connected pawns) (auxiliary; also marks 6-2-2RPPr, 6-2-0Rr)\n        flipcolor (R == 1 and P == 2 and r == 1 and connectedpawns == 2)\n\n        [Aa] == 6\n        comment(\"6-2-2RPPrConnected\")\n        comment(\"6-2-2RPPr\")\n        comment(\"6-2-0Rr\")\n    }\n    or\n    {\n        // 6-2-2RPPr: Rook + Two Pawns vs Rook (canonical; also marks 6-2-0Rr)\n        flipcolor (R == 1 and P == 2 and r == 1) \n\n        [Aa] == 6\n        comment(\"6-2-2RPPr\")\n        comment(\"6-2-0Rr\")\n    }\n    or\n    {\n        // 6-2-0Rr: Rook vs Rook (canonical)\n        R == 1 \n        r == 1\n\n        [QqBbNn] == 0\n        [Aa] >= 6\n        comment(\"6-2-0Rr\")\n    }\n    or\n    {\n        // 6-3RRrr: Two Rooks vs Two Rooks (canonical)\n        R == 2\n        r == 2\n\n        [QqBbNn] == 0\n        [Aa] >= 6\n        comment(\"6-3RRrr\")\n    }\n    or\n    {\n        // 7-1RN: Rook vs Knight (canonical)\n        flipcolor (R == 1 and n == 1 and [QqrNBb] == 0)\n        comment(\"7-1RN\")\n    }\n    or\n    {\n        // 7-2RB: Rook vs Bishop (canonical)\n        flipcolor (R == 1 and b == 1 and [QqrBNn] == 0)\n        comment(\"7-2RB\")\n    }\n    or\n    {\n        // 8-1RNrNoPawns: Rook + Knight vs Rook (without pawns) (auxiliary; also marks 8-1RNr)\n        flipcolor (R == 1 and N == 1 and r == 1 and n == 0)\n\n        [QqBbPp] == 0\n        comment(\"8-1RNrNoPawns\")\n        comment(\"8-1RNr\")\n    }\n    or\n    {\n        // 8-1RNr: Rook + Knight vs Rook (canonical)\n        flipcolor (R == 1 and N == 1 and r == 1 and n == 0) \n\n        [QqBb] == 0\n        comment(\"8-1RNr\")\n    }\n    or\n    {\n        // 8-2RBrNoPawns: Rook + Bishop vs Rook (without pawns) (auxiliary; also marks 8-2RBr)\n        flipcolor (R == 1 and B == 1 and r == 1 and [QqbNnPp] == 0)\n        comment(\"8-2RBrNoPawns\")\n        comment(\"8-2RBr\")\n    }\n    or\n    {\n        // 8-2RBr: Rook + Bishop vs Rook (canonical)\n        flipcolor (R == 1 and B == 1 and r == 1 and [QqbNn] == 0)\n        comment(\"8-2RBr\")\n    }\n    or\n    {\n        // 8-3RAra: Rook + Minor Piece vs Rook + Minor Piece (canonical)\n        R == 1 and [BN] == 1 and r == 1 and [bn] == 1 and [Qq] == 0\n        comment(\"8-3RAra\")\n    }\n    or\n    {\n        // 9-1Qp: Queen vs Pawns (canonical)\n        flipcolor (Q == 1 and p >= 1 and [qRrBbNnP] == 0)\n        comment(\"9-1Qp\")\n    }\n    or\n    {\n        // 9-3QPq: Queen + Pawn vs Queen (canonical; also marks 9-2Qq)\n        flipcolor (Q == 1 and P == 1 and q == 1 and [RrBbNnp] == 0)\n        comment(\"9-3QPq\")\n        comment(\"9-2Qq\")\n    }\n    or\n    {\n        // 9-2Qq: Queen vs Queen (canonical)\n        Q == 1\n        q == 1\n        [BbNnRr] == 0\n        comment(\"9-2Qq\")\n    }\n    or\n    {\n        // 10-1Qa: Queen vs One Minor Piece (canonical)\n        flipcolor (Q == 1 and [bn] == 1 and [qRrNB] == 0)\n        comment(\"10-1Qa\")\n    }\n    or\n    {\n        // 10-2QrNoPawns: Queen vs Rook (without pawns) (auxiliary; also marks 10-2Qr)\n        flipcolor (Q == 1 and r == 1 and [qRBbNnPp] == 0)\n        comment(\"10-2QrNoPawns\")\n        comment(\"10-2Qr\")\n    }\n    or\n    {\n        // 10-2Qr: Queen vs Rook (canonical)\n        flipcolor (Q == 1 and r == 1 and [qRBbNn] == 0)\n        comment(\"10-2Qr\")\n    }\n    or\n    {\n        // 10-3Qaa: Queen vs Two Minor Pieces (canonical)\n        flipcolor (Q == 1 and [bn] == 2 and [qBNRr] == 0)\n        comment(\"10-3Qaa\")\n    }\n    or\n    {\n        // 10-4Qra: Queen vs Rook + Minor Piece (canonical)\n        flipcolor (Q == 1 and r == 1 and [bn] == 1 and [qRBN] == 0)\n        comment(\"10-4Qra\")\n    }\n    or\n    {\n        // 10-5Qrr: Queen vs Two Rooks (canonical)\n        flipcolor (Q == 1 and r == 2 and [qRBbNn] == 0)\n        comment(\"10-5Qrr\")\n    }\n    or\n    {\n        // 10-6Qaaa: Queen vs Three Minor Pieces (canonical)\n        flipcolor (Q == 1 and [bn] == 3 and [qBNRr] == 0)\n        comment(\"10-6Qaaa\")\n    }\n    or\n    {\n        // 10-7-1QbrrNoPawns: Queen + Bishop vs Two Rooks (without pawns) (auxiliary; also marks 10-7-1Qbrr)\n        flipcolor (Q == 1 and B == 1 and r == 2 and [qRbNnPp] == 0)\n        comment(\"10-7-1QbrrNoPawns\")\n        comment(\"10-7-1Qbrr\")\n    }\n    or\n    {\n        // 10-7-1Qbrr: Queen + Bishop vs Two Rooks (canonical)\n        flipcolor (Q == 1 and B == 1 and r == 2 and [qRbNn] == 0) \n        comment(\"10-7-1Qbrr\")\n    }\n    or\n    {\n        // 10-7QAq: Queen and Minor Piece vs Queen (canonical)\n        flipcolor (Q == 1 and [BN] == 1 and q == 1 and [Rrbn] == 0)\n        comment(\"10-7QAq\")\n    }\n}"
+    },
+    {
+        "category": "table",
+        "name": "1-4BN",
+        "description": "Bishop and Knight vs. King",
+        "query": "// Bishop and Knight vs. King\n\ncql()\n\nflipcolor (N == 1 and B == 1)\n\n[Aa] == 4"
+    },
+    {
+        "category": "table",
+        "name": "10-1Qa",
+        "description": "Queen vs. one minor piece",
+        "query": "// Queen vs. one minor piece\n\ncql()\n\nflipcolor (Q == 1 and [bn] == 1 and [qRrNB] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-2Qr",
+        "description": "Queen vs. Rook (with pawns)",
+        "query": "// Queen vs. Rook (with pawns)\n\ncql()\n\nflipcolor (Q == 1 and r == 1 and [qRBbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-2QrNoPawns",
+        "description": "Queen vs rook, without pawns. Auxiliary FCE 10.2 sub-count; the canonical 10-2Qr row allows pawns.",
+        "query": "// Queen vs rook, without pawns.\n// Auxiliary FCE 10.2 sub-count; the canonical 10-2Qr row allows pawns.\n\ncql()\n\nflipcolor (Q == 1 and r == 1 and [qRBbNnPp] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-2QrPp",
+        "description": "Queen vs rook, pawns allowed. Explicit auxiliary alias for the canonical FCE 10.2 table row.",
+        "query": "// Queen vs rook, pawns allowed.\n// Explicit auxiliary alias for the canonical FCE 10.2 table row.\n\ncql()\n\nflipcolor (Q == 1 and r == 1 and [qRBbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-3Qaa",
+        "description": "Queen vs. two minor pieces",
+        "query": "// Queen vs. two minor pieces\n\ncql()\n\nflipcolor (Q == 1 and [bn] == 2 and [qBNRr] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-4Qra",
+        "description": "Queen vs. Rook and minor piece",
+        "query": "// Queen vs. Rook and minor piece\n\ncql()\n\nflipcolor (Q == 1 and r == 1 and [bn] == 1 and [qRBN] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-5Qrr",
+        "description": "Queen vs two rooks (with or without pawns)",
+        "query": "// Queen vs two rooks (with or without pawns)\n\ncql()\n\nflipcolor (Q == 1 and r == 2 and [qRBbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-6Qaaa",
+        "description": "Queen vs. three minor pieces",
+        "query": "// Queen vs. three minor pieces\n\ncql()\n\nflipcolor (Q == 1 and [bn] == 3 and [qBNRr] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-7-1Qbrr",
+        "description": "Queen and Bishop vs. Two Rooks (with pawns)",
+        "query": "// Queen and Bishop vs. Two Rooks (with pawns)\n\ncql()\n\nflipcolor (Q == 1 and B == 1 and r == 2 and [qRbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-7-1QbrrNoPawns",
+        "description": "Queen and bishop vs two rooks, without pawns. Auxiliary FCE 10.7.1 sub-count.",
+        "query": "// Queen and bishop vs two rooks, without pawns.\n// Auxiliary FCE 10.7.1 sub-count.\n\ncql()\n\nflipcolor (Q == 1 and B == 1 and r == 2 and [qRbNnPp] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-7-1QbrrPp",
+        "description": "Queen and bishop vs two rooks, pawns allowed. Explicit auxiliary alias for the canonical FCE 10.7.1 table row.",
+        "query": "// Queen and bishop vs two rooks, pawns allowed.\n// Explicit auxiliary alias for the canonical FCE 10.7.1 table row.\n\ncql()\n\nflipcolor (Q == 1 and B == 1 and r == 2 and [qRbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "10-7QAq",
+        "description": "Queen vs. Queen and minor piece",
+        "query": "// Queen vs. Queen and minor piece\n\ncql()\n\nflipcolor (Q == 1 and [BN] == 1 and q == 1 and [Rrbn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "2-0Pp",
+        "description": "pure pawn endings",
+        "query": "// pure pawn endings\n\ncql()\n\n[Pp] >= 1 and [QqRrBbNn] == 0"
+    },
+    {
+        "category": "table",
+        "name": "2-1P",
+        "description": "King and pawn vs. King",
+        "query": "// King and pawn vs. King\n\ncql()\n\nflipcolor (P == 1)\n\n[Aa] == 3"
+    },
+    {
+        "category": "table",
+        "name": "3-1Np",
+        "description": "Knight vs. pawn(s)",
+        "query": "// Knight vs. pawn(s)\n\ncql()\n\nflipcolor (N == 1 and p >= 1 and [QqRrBbn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "3-2NN",
+        "description": "Knight and pawns vs. Knight and pawns",
+        "query": "// Knight and pawns vs. Knight and pawns\n\ncql()\n\n(N == 1 and n == 1 and [QqRrBb] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "4-1Bp",
+        "description": "Bishop vs. Pawns",
+        "query": "// Bishop vs. Pawns\n\n\ncql()\n\nflipcolor (B == 1 and p >= 1 and [QqRrbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "4-2scBB",
+        "description": "bishop vs bishop (same colour)",
+        "query": "// bishop vs bishop (same colour)\n\ncql()\n\nB == 1 and b == 1 and flipvertical (light [Bb] == 2)\n\n[QqRrNn] == 0"
+    },
+    {
+        "category": "table",
+        "name": "4-3ocBB",
+        "description": "bishop vs bishop (opposite colour)",
+        "query": "// bishop vs bishop (opposite colour)\n\ncql()\n\nB == 1 and b == 1 and light [Bb] == 1 and dark [Bb] == 1\n\n[QqRrNn] == 0"
+    },
+    {
+        "category": "table",
+        "name": "5-0BN",
+        "description": "bishop vs knight",
+        "query": "// bishop vs knight\n\ncql()\n\nflipcolor (B == 1 and n == 1 and [bNQqRr] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "6-1-0RP",
+        "description": "rook vs pawns",
+        "query": "// rook vs pawns\n\ncql()\n\nflipcolor (R == 1 and p >= 1 and [QqrBbNnP] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "6-2-0Rr",
+        "description": "Rook and pawns vs rook and pawns",
+        "query": "// Rook and pawns vs rook and pawns\n\ncql()\n\n\nR == 1 \nr == 1\n\n[QqBbNn] == 0\n[Aa] >= 6"
+    },
+    {
+        "category": "table",
+        "name": "6-2-1RPr",
+        "description": "rook and pawn vs rook",
+        "query": "// rook and pawn vs rook\n\ncql()\n\nflipcolor (R == 1 and P == 1 and r == 1)\n\n[Aa] == 5"
+    },
+    {
+        "category": "table",
+        "name": "6-2-2RPPr",
+        "description": "Rook and two pawns vs. Rook",
+        "query": "// Rook and two pawns vs. Rook \n\ncql()\n\nflipcolor (R == 1 and P == 2 and r == 1) \n\n[Aa] == 6"
+    },
+    {
+        "category": "table",
+        "name": "6-2-2RPPrConnected",
+        "description": "Rook and two connected pawns vs rook. Auxiliary FCE 6.2 A2 sub-count.",
+        "query": "// Rook and two connected pawns vs rook.\n// Auxiliary FCE 6.2 A2 sub-count.\n\ncql()\n\nflipcolor (R == 1 and P == 2 and r == 1 and connectedpawns == 2)\n\n[Aa] == 6"
+    },
+    {
+        "category": "table",
+        "name": "6-3RRrr",
+        "description": "Two rooks vs. Two rooks (and pawns)",
+        "query": "// Two rooks vs. Two rooks (and pawns)\n\ncql()\n\nR == 2\nr == 2\n\n[QqBbNn] == 0\n[Aa] >= 6"
+    },
+    {
+        "category": "table",
+        "name": "7-1RN",
+        "description": "Rook vs. Knight",
+        "query": "// Rook vs. Knight\n\ncql()\n\nflipcolor (R == 1 and n == 1 and [QqrNBb] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "7-2RB",
+        "description": "Rook vs. Bishop",
+        "query": "// Rook vs. Bishop\n\ncql()\n\nflipcolor (R == 1 and b == 1 and [QqrBNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "8-1RNr",
+        "description": "Rook and knight vs rook (with pawns)",
+        "query": "// Rook and knight vs rook (with pawns)\n\ncql()\n\nflipcolor (R == 1 and N == 1 and r == 1 and n == 0) \n\n[QqBb] == 0"
+    },
+    {
+        "category": "table",
+        "name": "8-1RNrNoPawns",
+        "description": "Rook and knight vs rook, without pawns. Auxiliary FCE 8.1 sub-count; the canonical 8-1RNr row allows pawns.",
+        "query": "// Rook and knight vs rook, without pawns.\n// Auxiliary FCE 8.1 sub-count; the canonical 8-1RNr row allows pawns.\n\ncql()\n\nflipcolor (R == 1 and N == 1 and r == 1 and n == 0)\n\n[QqBbPp] == 0"
+    },
+    {
+        "category": "table",
+        "name": "8-1RNrPp",
+        "description": "Rook and knight vs rook, pawns allowed. Explicit auxiliary alias for the canonical FCE 8.1 table row.",
+        "query": "// Rook and knight vs rook, pawns allowed.\n// Explicit auxiliary alias for the canonical FCE 8.1 table row.\n\ncql()\n\nflipcolor (R == 1 and N == 1 and r == 1 and n == 0)\n\n[QqBb] == 0"
+    },
+    {
+        "category": "table",
+        "name": "8-2RBr",
+        "description": "Rook and bishop vs rook (with pawns)",
+        "query": "// Rook and bishop vs rook (with pawns)\n\ncql()\n\nflipcolor (R == 1 and B == 1 and r == 1 and [QqbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "8-2RBrNoPawns",
+        "description": "Rook and bishop vs rook, without pawns. Auxiliary FCE 8.2 sub-count; the canonical 8-2RBr row allows pawns.",
+        "query": "// Rook and bishop vs rook, without pawns.\n// Auxiliary FCE 8.2 sub-count; the canonical 8-2RBr row allows pawns.\n\ncql()\n\nflipcolor (R == 1 and B == 1 and r == 1 and [QqbNnPp] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "8-2RBrPp",
+        "description": "Rook and bishop vs rook, pawns allowed. Explicit auxiliary alias for the canonical FCE 8.2 table row.",
+        "query": "// Rook and bishop vs rook, pawns allowed.\n// Explicit auxiliary alias for the canonical FCE 8.2 table row.\n\ncql()\n\nflipcolor (R == 1 and B == 1 and r == 1 and [QqbNn] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "8-3RAra",
+        "description": "Rook and minor piece vs. Rook and minor piece",
+        "query": "// Rook and minor piece vs. Rook and minor piece\n\ncql()\n\nR == 1 and [BN] == 1 and r == 1 and [bn] == 1 and [Qq] == 0"
+    },
+    {
+        "category": "table",
+        "name": "9-1Qp",
+        "description": "Chapter 9.1 Queen vs. Pawns",
+        "query": "// Chapter 9.1 Queen vs. Pawns\n\ncql()\n\nflipcolor (Q == 1 and p >= 1 and [qRrBbNnP] == 0)"
+    },
+    {
+        "category": "table",
+        "name": "9-2Qq",
+        "description": "Queen vs. Queen (and pawns)",
+        "query": "// Queen vs. Queen (and pawns)\n\ncql()\n\nQ == 1\nq == 1\n[BbNnRr] == 0"
+    },
+    {
+        "category": "table",
+        "name": "9-3QPq",
+        "description": "Queen and pawn vs. Queen",
+        "query": "// Queen and pawn vs. Queen\n\ncql()\n\nflipcolor (Q == 1 and P == 1 and q == 1 and [RrBbNnp] == 0)"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "advancedPawn",
+        "description": "advancedPawn - a pawn is pushed to the 6th, 7th, or 8th rank",
+        "query": "// advancedPawn - a pawn is pushed to the 6th, 7th, or 8th rank\n\ncql()\n flipcolor {wtm\n  move from P to [a-h]6-8}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "advantage",
+        "description": "advantage - the solution yields a clear positional or material advantage Note: precise eval thresholds require engine analysis. This approximation finds positions with moderate material advantage.",
+        "query": "// advantage - the solution yields a clear positional or material advantage\n// Note: precise eval thresholds require engine analysis.\n// This approximation finds positions with moderate material advantage.\n\ncql()\n flipcolor {\n  result 1-0\n  not mate\n  power A - power a >= 2\n  power A - power a <= 5}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "anastasiaMate",
+        "description": "anastasiaMate - king on a/h file mated by rook/queen with knight support",
+        "query": "// anastasiaMate - king on a/h file mated by rook/queen with knight support\n\ncql()\n flipcolor {\nmate\nR  attacks  k\n_  attackedby  k == 4\n\nsquare all x in _  attackedby  k\n       (R  attacks  x) or (N  attacks  x)}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "arabianMate",
+        "description": "arabianMate - king in corner mated by rook and knight",
+        "query": "// arabianMate - king in corner mated by rook and knight\n\ncql()\n flipcolor {mate\nR  attacks  k\nk  attacks  R\nN  attacks  R\n_  attackedby  k == 2}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "attackingF2F7",
+        "description": "attackingF2F7 - capturing on f2 or f7 while the opponent king is on its starting square",
+        "query": "// attackingF2F7 - capturing on f2 or f7 while the opponent king is on its starting square\n\ncql()\nor {\n  wtm move capture to f7 ke8\n  btm move capture to f2 Ke1\n}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "attraction",
+        "description": "attraction - a piece is sacrificed to lure an opponent piece to a vulnerable square",
+        "query": "// attraction - a piece is sacrificed to lure an opponent piece to a vulnerable square\n\ncql()\n flipcolor {wtm\n  move capture [QRBN]\n  : move from [kqr] to to\n  : move capture [kqr]}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "backRankMate",
+        "description": "backRankMate - checkmate on the back rank where the king is trapped by its own pieces",
+        "query": "// backRankMate - checkmate on the back rank where the king is trapped by its own pieces\n\ncql()\n flipcolor { mate\n[RQ]  attacks  k\nka-h8\n[RQ]a-h8}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "bishopEndgame",
+        "description": "bishopEndgame - bishops, kings, and pawns only",
+        "query": "// bishopEndgame - bishops, kings, and pawns only\n\ncql()\n[QRNqrn] == 0\n[Bb] >= 1"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "bodenMate",
+        "description": "bodenMate - two bishops on criss-crossing diagonals deliver mate",
+        "query": "// bodenMate - two bishops on criss-crossing diagonals deliver mate\n\ncql()\n flipcolor {btm mate\nB  attacks  k\n#(B  attacks  k) == 2\n\nsquare all x in _  attackedby  k\n       B  attacks  x}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "capturingDefender",
+        "description": "capturingDefender - a defender is captured, leaving the piece it protected vulnerable",
+        "query": "// capturingDefender - a defender is captured, leaving the piece it protected vulnerable\n\ncql()\n flipcolor {wtm\n  piece D in [qrbnp]\n  piece T in [qrbnp]\n  D  attacks  T\n  move capture D\n  : not [a]  attacks  T}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "castling",
+        "description": "castling - the solution involves castling",
+        "query": "// castling - the solution involves castling\n\ncql()\nmove castle"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "clearance",
+        "description": "clearance - a piece moves off a line to allow a ray piece to use that line",
+        "query": "// clearance - a piece moves off a line to allow a ray piece to use that line\n\ncql()\n flipcolor {wtm\n  piece V in [QRBNP]\n  piece E in [QRB]\n  ray orthogonal (E V) or ray diagonal (E V)\n  move from V\n  : not ray orthogonal (E V) and not ray diagonal (E V)}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "collinear",
+        "description": "collinear - a ray piece moves along the same line as an opponent ray piece",
+        "query": "// collinear - a ray piece moves along the same line as an opponent ray piece\n\ncql()\n flipcolor {wtm\n  piece X in [QRB]\n  piece Y in [qrb]\n  ray orthogonal (X Y) or ray diagonal (X Y)\n  move from X\n  : ray orthogonal (X Y) or ray diagonal (X Y)}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "crushing",
+        "description": "crushing - the solution wins decisive material (no mate) Note: precise eval thresholds require engine analysis. This approximation finds positions with large material gains.",
+        "query": "// crushing - the solution wins decisive material (no mate)\n// Note: precise eval thresholds require engine analysis.\n// This approximation finds positions with large material gains.\n\ncql()\n flipcolor {\n  result 1-0\n  not mate\n  power A - power a >= 6}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "defensiveMove",
+        "description": "defensiveMove - a quiet defensive move, often the final move of the puzzle",
+        "query": "// defensiveMove - a quiet defensive move, often the final move of the puzzle\n\ncql()\n flipcolor {wtm\n  not check\n  move from [QRBNPK]\n  : not check\n  : not move capture [Aa]\n  : not A  attacks  [qrbn]}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "deflection",
+        "description": "deflection - an opponent defender is forced away from a critical square",
+        "query": "// deflection - an opponent defender is forced away from a critical square\n\ncql()\n flipcolor {wtm\n  piece D in [qrbnp]\n  piece T in [qrbnp]\n  D  attacks  T\n  move from A to D\n  : not D  attacks  T}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "discoveredAttack",
+        "description": "discoveredAttack - a piece moves off a line revealing an attack by another piece",
+        "query": "// discoveredAttack - a piece moves off a line revealing an attack by another piece\n\ncql()\n flipcolor {(A & ~(move to . previous))  attacks  k}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "doubleBishopMate",
+        "description": "doubleBishopMate - two bishops on parallel diagonals deliver mate",
+        "query": "// doubleBishopMate - two bishops on parallel diagonals deliver mate\n\ncql()\n flipcolor {btm mate\n#(B  attacks  k) == 1\n#B >= 2\n\nsquare all x in _  attackedby  k\n       B  attacks  x}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "doubleCheck",
+        "description": "doubleCheck - two pieces give check simultaneously",
+        "query": "// doubleCheck - two pieces give check simultaneously\n\ncql()\n flipcolor {btm check\n  A  attacks  k >= 2}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "dovetailMate",
+        "description": "dovetailMate - queen mates diagonally adjacent to king, escape squares blocked by own pieces",
+        "query": "// dovetailMate - queen mates diagonally adjacent to king, escape squares blocked by own pieces\n\ncql() mate flipcolor shift flip {\n  Qg2 kg3 [a]f4 [a]h4\n  _ attackedby k == 5 and A attacks (_ attackedby k) == 1\n}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "enPassant",
+        "description": "enPassant - the solution involves an en passant capture",
+        "query": "// enPassant - the solution involves an en passant capture\n\ncql()\nmove enpassant"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "equality",
+        "description": "equality - the solution holds equality or achieves a draw Note: precise eval thresholds require engine analysis.",
+        "query": "// equality - the solution holds equality or achieves a draw\n// Note: precise eval thresholds require engine analysis.\n\ncql()\nresult \"1/2-1/2\""
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "exposedKing",
+        "description": "exposedKing - the opponent king lacks pawn shelter and is vulnerable to attack",
+        "query": "// exposedKing - the opponent king lacks pawn shelter and is vulnerable to attack\n\ncql()\n flipcolor {\n  k[a-h]5-8\n  not p  attacks  k\n  check}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "fork",
+        "description": "fork - a piece attacks two or more opponent pieces simultaneously",
+        "query": "// fork - a piece attacks two or more opponent pieces simultaneously\n\ncql()\n flipcolor {wtm\npiece X in [NBRQP]\n  move from X\n  : X  attacks  [kqrbn] >= 2}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "hangingPiece",
+        "description": "hangingPiece - an undefended opponent piece is captured",
+        "query": "// hangingPiece - an undefended opponent piece is captured\n\ncql()\n flipcolor {wtm\n  piece T in [qrbn]\n  not [a]  attacks  T\n  move capture T}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "hookMate",
+        "description": "hookMate - rook mates adjacent to king, defended by knight, knight defended by pawn",
+        "query": "// hookMate - rook mates adjacent to king, defended by knight, knight defended by pawn\n\ncql()\n flipcolor {btm mate\nR  attacks  k\nk  attacks  R\nN  attacks  R\nk  attacks  N\nP  attacks  N}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "interference",
+        "description": "interference - a piece blocks the line between an opponent defender and the square it guards",
+        "query": "// interference - a piece blocks the line between an opponent defender and the square it guards\n\ncql()\n flipcolor {\n  piece D in [qrb]\n  piece T in [a]\n  D  attacks  T\n  move from [Aa] to between(D T)\n  : not D  attacks  T\n}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "intermezzo",
+        "description": "intermezzo - an in-between move (zwischenzug) inserted before the expected recapture",
+        "query": "// intermezzo - an in-between move (zwischenzug) inserted before the expected recapture\n\ncql()\n flipcolor {wtm\n  move capture [Aa]\n  : move capture [Aa]\n  : not move capture to\n  : check\n  : move capture to}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "kingsideAttack",
+        "description": "kingsideAttack - an attack against the castled king on the kingside",
+        "query": "// kingsideAttack - an attack against the castled king on the kingside\n\ncql()\n flipcolor {\n  k[g-h]8\n  #[Aa] >= 20\n  check}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "knightEndgame",
+        "description": "knightEndgame - knights, kings, and pawns only",
+        "query": "// knightEndgame - knights, kings, and pawns only\n\ncql()\n#[QRBqrb] == 0\n#[Nn] >= 1"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "long",
+        "description": "long - the puzzle solution is 3 moves",
+        "query": "// long - the puzzle solution is 3 moves\n\ncql()\nwtm\nline --> . --> . --> . --> . --> terminal"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "mate",
+        "description": "mate - the puzzle ends in checkmate",
+        "query": "// mate - the puzzle ends in checkmate\n\ncql()\nmate"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "mateIn1",
+        "description": "mateIn1 - checkmate delivered in 1 move",
+        "query": "// mateIn1 - checkmate delivered in 1 move\n\ncql()\nwtm\nline --> mate"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "mateIn2",
+        "description": "mateIn2 - checkmate in 2 moves",
+        "query": "// mateIn2 - checkmate in 2 moves\n\ncql()\nwtm\nline --> . --> . --> mate"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "mateIn3",
+        "description": "mateIn3 - checkmate in 3 moves",
+        "query": "// mateIn3 - checkmate in 3 moves\n\ncql()\nwtm\nline --> . --> . --> . --> . --> mate"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "mateIn4",
+        "description": "mateIn4 - checkmate in 4 moves",
+        "query": "// mateIn4 - checkmate in 4 moves\n\ncql()\nwtm\nline --> . --> . --> . --> . --> . --> . --> mate"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "mateIn5",
+        "description": "mateIn5 - checkmate in 5 or more moves",
+        "query": "// mateIn5 - checkmate in 5 or more moves\n\ncql()\nwtm\nline --> . --> . --> . --> . --> . --> . --> . --> .+ --> mate"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "oneMove",
+        "description": "oneMove - the puzzle solution is 1 move",
+        "query": "// oneMove - the puzzle solution is 1 move\n\ncql()\nwtm\nline --> terminal"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "pawnEndgame",
+        "description": "pawnEndgame - kings and pawns only",
+        "query": "// pawnEndgame - kings and pawns only\n\ncql()\n[QRBNqrbn] == 0\n[Pp] >= 1"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "pin",
+        "description": "pin - an opponent piece is pinned against a more valuable piece behind it",
+        "query": "// pin - an opponent piece is pinned against a more valuable piece behind it\n\ncql()\n flipcolor {pin from [QRB] through a}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "promotion",
+        "description": "promotion - a pawn promotes during the solution",
+        "query": "// promotion - a pawn promotes during the solution\n\ncql()\nmove promote [QRBN]"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "queenEndgame",
+        "description": "queenEndgame - queens, kings, and pawns only",
+        "query": "// queenEndgame - queens, kings, and pawns only\n\ncql()\n[RBNrbn] == 0\n[Qq] >= 1"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "queenRookEndgame",
+        "description": "queenRookEndgame - queens and rooks with kings and pawns only",
+        "query": "// queenRookEndgame - queens and rooks with kings and pawns only\n\ncql()\n#[BNbn] == 0\n#[Qq] >= 1\n#[Rr] >= 1"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "queensideAttack",
+        "description": "queensideAttack - an attack against the castled king on the queenside",
+        "query": "// queensideAttack - an attack against the castled king on the queenside\n\ncql()\n flipcolor {\n  k[a-c]8\n  #[Aa] >= 18\n  check}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "quietMove",
+        "description": "quietMove - a subtle move that is not a capture, check, or direct attack",
+        "query": "// quietMove - a subtle move that is not a capture, check, or direct attack\n\ncql()\n flipcolor {wtm\n  move from [QRBNP]\n  : not check\n  : not move capture [Aa]\n  : not A  attacks  [qrbn]}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "rookEndgame",
+        "description": "rookEndgame - rooks, kings, and pawns only",
+        "query": "// rookEndgame - rooks, kings, and pawns only\n\ncql()\n#[QBNqbn] == 0\n#[Rr] >= 1"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "sacrifice",
+        "description": "sacrifice - the player accepts a temporary material loss for a greater gain",
+        "query": "// sacrifice - the player accepts a temporary material loss for a greater gain\n\ncql()\n flipcolor {\n  result 1-0\n  path nestban\n    -- power a - power A >= 3 {2,}\n}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "short",
+        "description": "short - the puzzle solution is 2 moves",
+        "query": "// short - the puzzle solution is 2 moves\n\ncql()\nwtm\nline --> . --> . --> terminal"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "skewer",
+        "description": "skewer - a ray piece attacks through a high-value piece to a lower-value piece behind it",
+        "query": "// skewer - a ray piece attacks through a high-value piece to a lower-value piece behind it\n\ncql()\n flipcolor {\n  ray orthogonal (R k [qrbn])\n  or\n  ray diagonal (B k [qrbn])\n  or\n  ray orthogonal (Q k [qrbn])\n  or\n  ray diagonal (Q k [qrbn])\n}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "smotheredMate",
+        "description": "smotheredMate - knight checkmate where the king is surrounded by its own pieces",
+        "query": "// smotheredMate - knight checkmate where the king is surrounded by its own pieces\n\ncql()\n flipcolor {btm mate\nN  attacks  k\nnot k  attacks  [_A]}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "trappedPiece",
+        "description": "trappedPiece - a non-pawn opponent piece is captured after being trapped with no safe escape",
+        "query": "// trappedPiece - a non-pawn opponent piece is captured after being trapped with no safe escape\n\ncql()\n flipcolor {wtm\n  piece T in [qrbn]\n  A  attacks  T\n  move legal from T == 0\n  move capture T}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "underPromotion",
+        "description": "underPromotion - a pawn promotes to a piece other than a queen",
+        "query": "// underPromotion - a pawn promotes to a piece other than a queen\n\ncql()\nmove promote [RBN]"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "veryLong",
+        "description": "veryLong - the puzzle solution is 4 or more moves",
+        "query": "// veryLong - the puzzle solution is 4 or more moves\n\ncql()\nwtm\nline --> . --> . --> . --> . --> . --> . --> .+ --> terminal"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "xRayAttack",
+        "description": "xRayAttack - a piece attacks through another piece on the same line",
+        "query": "// xRayAttack - a piece attacks through another piece on the same line\n\ncql()\n flipcolor {\n  piece X in [QRB]\n  piece Y in [qrbnp]\n  piece Z in [qrbnp]\n  ray orthogonal (X Y Z) or ray diagonal (X Y Z)\n}"
+    },
+    {
+        "category": "Positional & Strategic Motifs (Lila)",
+        "name": "zugzwang",
+        "description": "zugzwang - any move the opponent makes worsens their position Note: true zugzwang detection requires engine evaluation. This approximation finds positions where the side to move has very few legal moves.",
+        "query": "// zugzwang - any move the opponent makes worsens their position\n// Note: true zugzwang detection requires engine evaluation.\n// This approximation finds positions where the side to move has very few legal moves.\n\ncql()\n flipcolor {btm\n  move count legal <= 3\n  not check}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "BN",
+        "description": "Bishop-and-knight mate: K+B+N vs bare K. The bare king is forced to a corner of the same colour as the bishop and mated there.",
+        "query": "// Bishop-and-knight mate: K+B+N vs bare K. The bare king is forced to\n// a corner of the same colour as the bishop and mated there.\n\ncql()\n\nflipcolor {\n    mate\n    [Aa] == 4                            // only the four pieces on board\n    B == 1\n    N == 1\n    # (. attackedby k) == 3              // bare king in a corner\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "KBB",
+        "description": "Two-bishop endgame mate: K+B+B vs bare K. Bishops on opposite colours drive the bare king to a corner.",
+        "query": "// Two-bishop endgame mate: K+B+B vs bare K. Bishops on opposite colours\n// drive the bare king to a corner.\n\ncql()\n\nflipcolor {\n    mate\n    [Aa] == 4                            // only the four pieces on board\n    B == 2\n    # (. attackedby k) == 3              // bare king in a corner\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "KNN",
+        "description": "Two-knight endgame mate: K+N+N vs bare K. Cannot be forced in general, but mate positions exist with the bare king in a corner.",
+        "query": "// Two-knight endgame mate: K+N+N vs bare K. Cannot be forced in\n// general, but mate positions exist with the bare king in a corner.\n\ncql()\n\nflipcolor {\n    mate\n    [Aa] == 4                            // only the four pieces on board\n    N == 2\n    # (. attackedby k) == 3              // bare king in a corner\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "anastasiamate",
+        "description": "Anastasia's mate: knight and rook team up to trap the opposing king against the edge of the board. The rook delivers the check (often from behind a friendly piece via x-ray); the knight covers the flight squares on the open side; exactly one own piece blocks the remaining flight on the same rank/file as the rook.",
+        "query": "// Anastasia's mate: knight and rook team up to trap the opposing king\n// against the edge of the board. The rook delivers the check (often\n// from behind a friendly piece via x-ray); the knight covers the\n// flight squares on the open side; exactly one own piece blocks the\n// remaining flight on the same rank/file as the rook.\n\ncql()\n\nflipcolor {\n    mate\n    R attacks k\n    N >= 1                                  // knight is part of the trap\n    # (. attackedby k) == 5                 // king on the edge (not corner)\n    # ([a] & . attackedby k) == 1           // exactly one friendly blocker\n    # (R attacks (_ attackedby k)) >= 1     // rook covers at least one flight\n    # (N attacks (_ attackedby k)) >= 1     // knight covers at least one flight\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "anderssen",
+        "description": "Anderssen's mate: a rook or queen checkmates the opposing king along the back rank (8th rank for white attacker), supported by a diagonally attacking piece - typically a pawn or bishop.",
+        "query": "// Anderssen's mate: a rook or queen checkmates the opposing king along\n// the back rank (8th rank for white attacker), supported by a\n// diagonally attacking piece - typically a pawn or bishop.\n\ncql()\n\nflipcolor {\n    mate\n    k & a-h8                             // black king on rank 8\n    [RQ] attacks k                       // rook or queen checks\n    k attacks [RQ]                       // attacker adjacent to king\n    [PB] attacks [RQ]                    // pawn or bishop supports\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "arabianmate",
+        "description": "arabian mate the knight and the rook team up to trap the opposing king on a corner of the board. The rook sits on a square adjacent to the king both to prevent escape along the diagonal and to deliver checkmate while the knight sits two squares away diagonally from the king to prevent escape on the square next to the king and to protect the rook.",
+        "query": "// arabian mate\n\n// the knight and the rook team up to trap the opposing king on a corner of the board. The rook sits on a square adjacent to the king both to prevent escape along the diagonal\n// and to deliver checkmate while the knight sits two squares away diagonally from the king to prevent escape on the square next to the king and to protect the rook.\n\ncql()\nflipcolor{\nmate\nR  attacks  k\nk  attacks  R\nN  attacks  R\n_  attackedby  k == 2}\n\n\n//cql() mate flipcolor shift flip {\n//    Nf6 Rh7 kh8\n//}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "backrankmate",
+        "description": "Back-rank mate: a rook or queen checkmates the king along its back rank (1st or 8th rank), where the king is shut in by its own pieces (usually pawns) on the next rank.",
+        "query": "// Back-rank mate: a rook or queen checkmates the king along its back\n// rank (1st or 8th rank), where the king is shut in by its own pieces\n// (usually pawns) on the next rank.\n\ncql()\n\nflipcolor {\n    mate\n    k & a-h8                             // black king on rank 8\n    [RQ] attacks k                       // rook or queen checks\n    # ([a] & . attackedby k) >= 2        // at least 2 friendly blockers around king\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "balestramate",
+        "description": "Searches for the balestramate checkmate pattern.",
+        "query": "// Searches for the balestramate checkmate pattern.\n\ncql()\nflipcolor{\nmate\nB  attacks  k\nsquare all x in _  attackedby  k\n(B  attacks  x) or (Q  attacks  x)}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "blackburnemate",
+        "description": "Blackburne's mate: two bishops on different diagonals near the king plus a knight cutting off sideways escape, with the king near the edge of the board.",
+        "query": "// Blackburne's mate: two bishops on different diagonals near the king\n// plus a knight cutting off sideways escape, with the king near the\n// edge of the board.\n\ncql()\n\nflipcolor {\n    mate\n    B == 2\n    N >= 1\n    B attacks k\n    # (. attackedby k) <= 5              // king at the edge of the board\n    square all x in _ attackedby k\n        (B attacks x) or (N attacks x)\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "blindswinemate",
+        "description": "Blind-swine mate: doubled rooks on the seventh rank deliver checkmate to a king on the back rank. The name (Janowski) refers to two connected rooks on the opponent's 7th.",
+        "query": "// Blind-swine mate: doubled rooks on the seventh rank deliver\n// checkmate to a king on the back rank. The name (Janowski) refers\n// to two connected rooks on the opponent's 7th.\n\ncql()\n\nflipcolor {\n    mate\n    k & a-h8                             // black king on rank 8\n    R[a-h7] == 2                         // both white rooks on rank 7\n    R attacks k                          // a rook delivers check\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "bodenmate",
+        "description": "Boden's mate: two bishops on criss-crossing diagonals deliver checkmate to a king whose flight squares are blocked by its own pieces (typically a rook plus a pawn).",
+        "query": "// Boden's mate: two bishops on criss-crossing diagonals deliver\n// checkmate to a king whose flight squares are blocked by its own\n// pieces (typically a rook plus a pawn).\n\ncql()\n\nflipcolor {\n    mate\n    B == 2\n    B attacks k\n    square all x in _ attackedby k\n        B attacks x                      // every empty flight square attacked by a bishop\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "castlingmate",
+        "description": "Searches for the castlingmate checkmate pattern.",
+        "query": "// Searches for the castlingmate checkmate pattern.\n\ncql()\nmate { move previous o-o or move previous o-o-o }"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "corner",
+        "description": "Searches for the corner checkmate pattern.",
+        "query": "// Searches for the corner checkmate pattern.\n\ncql() mate flipcolor shift flip {\n    Nf7 kh8 ph7 Rg1-7\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "damiano",
+        "description": "Checkmating Patterns CQL query (damiano).",
+        "query": "/*\nDamiano's mate is a classic method of checkmating and one of the oldest. It works by confining the king with a pawn and using a queen to execute the checkmate. Damiano's mate is often arrived at by first sacrificing a rook on the h-file, then checking the king with the queen on the a-file or h-file, and then moving in for the mate.\n*/\n\ncql() mate flipcolor shift flip {\n    kg8 rf8 Qh7 pg7 Pg6\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "damianobishopmate",
+        "description": "Searches for the damianobishopmate checkmate pattern.",
+        "query": "// Searches for the damianobishopmate checkmate pattern.\n\n\n\ncql()\nflipcolor{\nmate\nQ  attacks  k\nk  attacks  Q\nB  attacks  Q}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "davidandgoliath",
+        "description": "Searches for the davidandgoliath checkmate pattern.",
+        "query": "// Searches for the davidandgoliath checkmate pattern.\n\ncql()\nflipcolor{\nmate\nP  attacks  k}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "doubleknight",
+        "description": "Searches for the doubleknight checkmate pattern.",
+        "query": "// Searches for the doubleknight checkmate pattern.\n\ncql() mate flipcolor shift flip {\n    ka8 pa7 pb7 Nc7 Nd7\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "dovetailmate",
+        "description": "Dovetail (Cozio's) mate: queen diagonally adjacent to king, mate, with two friendly pieces blocking the king's orthogonal flight squares. King is not on the edge (5 empty neighbours).",
+        "query": "// Dovetail (Cozio's) mate: queen diagonally adjacent to king, mate,\n// with two friendly pieces blocking the king's orthogonal flight\n// squares. King is not on the edge (5 empty neighbours).\n\ncql()\n\nflipcolor {\n    mate\n    Q attacks k\n    k attacks Q\n    ray diagonal (Q k)\n    _ attackedby k == 5\n    # ([a] & . attackedby k) == 2\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "epaulettemate",
+        "description": "Epaulette mate. Pieces located relative to the king's position. cc l hampton",
+        "query": "// Epaulette mate.\n// Pieces located relative to the king's position.\n\n// cc l hampton\n\n\ncql() mate flipcolor {\n  // Locate the king and his epaulettes.\n  ka-h8  horizontal 1 k & r == 2\n  // King's field on adjacent rank are all empty or hold\n  // a double epaulette.\n  _ attackedby k == 3  or  p attackedby k == 2\n  // The queen (and only the queen) checks.\n  down 2 6 k & Q attacks k  and  A attacks k == 1\n  // Only the queen guards any of the flight squares.\n  A attacks (_ attackedby k) == 1\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "greco",
+        "description": "Searches for the greco checkmate pattern.",
+        "query": "// Searches for the greco checkmate pattern.\n\ncql()\nflipcolor{btm mate\nQ  attacks  k\n\nsquare all x in _  attackedby  k\n       (B  attacks  x) or (Q  attacks  x)}\n\n\n// if you wanted to sort by which has more pieces\n//sort power a"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "hookmate",
+        "description": "Searches for the hookmate checkmate pattern.",
+        "query": "// Searches for the hookmate checkmate pattern.\n\n\n\n\ncql()\nflipcolor{btm mate\nR  attacks  k\nk  attacks  R\nN  attacks  R\nk  attacks  N\nP  attacks  N}\n\n//cql() mate flipcolor shift flip {\n//    Re8 Nf6 [PB]e5\n//}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "ismate",
+        "description": "Detect positions where the side to move is checkmated.",
+        "query": "// Detect positions where the side to move is checkmated.\ncql()\n\nmate"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "killbox",
+        "description": "Searches for the killbox checkmate pattern.",
+        "query": "// Searches for the killbox checkmate pattern.\n\n\n\ncql()\nflipcolor{btm mate\nR  attacks  k\nk  attacks  R\nnot k  attacks  Q\nQ  attacks  R}\n\n//cql() mate flipcolor shift flip {\n//    ka5 Ra6 Qc4\n//}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "laddermate",
+        "description": "Ladder (lawnmower) mate: two major pieces working together push the bare king to the edge of the board. One major delivers check on the edge; the other cuts off the adjacent rank or file.",
+        "query": "// Ladder (lawnmower) mate: two major pieces working together push the\n// bare king to the edge of the board. One major delivers check on the\n// edge; the other cuts off the adjacent rank or file.\n\ncql()\n\nflipcolor {\n    mate\n    # (. attackedby k) == 5              // king on the edge (not corner)\n    [RQ] attacks k                       // a major piece checks\n    # [RQ] >= 2                          // at least two majors on white's side\n    _ attackedby k == 5                  // all 5 neighbours empty (bare king)\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "legalmate",
+        "description": "Searches for the legalmate checkmate pattern.",
+        "query": "// Searches for the legalmate checkmate pattern.\n\ncql() mate flipcolor shift flip {\n    Nd5 Ne5 Bf7 ke7\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "lolli",
+        "description": "Searches for the lolli checkmate pattern.",
+        "query": "// Searches for the lolli checkmate pattern.\n\ncql() \n\nmate flipcolor shift flip {\n    kg8 Qg7 Pf6\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "maxlangemate",
+        "description": "Max Lange's mate: queen + bishop. Bishop defends the queen; queen is adjacent to the king and delivers the check. Geometrically very similar to Damiano's-bishop mate - the two are effectively the same motif under different names.",
+        "query": "// Max Lange's mate: queen + bishop. Bishop defends the queen; queen\n// is adjacent to the king and delivers the check. Geometrically very\n// similar to Damiano's-bishop mate - the two are effectively the same\n// motif under different names.\n\ncql()\n\nflipcolor {\n    mate\n    Q attacks k\n    k attacks Q\n    B attacks Q\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "mayet",
+        "description": "Searches for the mayet checkmate pattern.",
+        "query": "// Searches for the mayet checkmate pattern.\n\n\n\ncql()\nflipcolor{btm mate\nR  attacks  k\nk  attacks  R\nB  attacks  R\n_  attackedby  k == 3}\n\n//cql() mate flipcolor shift flip {\n//    kg8 Rh8 Bb2 \n//}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "morphymate",
+        "description": "Searches for the morphymate checkmate pattern.",
+        "query": "// Searches for the morphymate checkmate pattern.\n\n\n\n\ncql()\nflipcolor{btm mate\nB  attacks  k\n_  attackedby  k == 2\n\nsquare all x in _  attackedby  k\n       (B  attacks  x) or (R  attacks  x)}\n\n//cql() mate flipcolor shift flip {\n//    Bf6 Rg1 kh8 \n//}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "opera",
+        "description": "Checkmating Patterns CQL query (opera).",
+        "query": "/*It works by attacking an uncastled king on the back rank\nwith a rook using a bishop to protect it. An enemy pawn or\na piece other than a knight is used to restrict the enemy\nking's movement.\n\nRook attacks king\nKing attacks rook\n*/\n\ncql()\nflipcolor{btm mate\nR attacks k\nk attacks R\nB attacks R\n\nsquare all x in _  attackedby  k\n       (B  attacks  x) or (R  attacks  x)}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "pillsbury",
+        "description": "Checkmating Patterns CQL query (pillsbury).",
+        "query": "/*Pillsbury's mate[22] is a common method of checkmating and is named for\nHarry Nelson Pillsbury.\nIt works by attacking the king with the rook while the bishop is\ncutting off the king.[23]\nIt is very similar to Morphy's Mate, in fact in some ways\nthey are interchangeable,\nthe main difference is that in Pillsbury's mate, the bishop could be on h6.\n*/\ncql()\nflipcolor{btm mate\nR  attacks  k\n_ attackedby k == 2\n\nsquare all x in _  attackedby  k\n       (B  attacks  x) or (R  attacks  x)}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "queen",
+        "description": "Searches for the queen checkmate pattern.",
+        "query": "// Searches for the queen checkmate pattern.\n\ncql()\nflipcolor{\n    mate\nQ  attacks  k\nk  attacks  Q\nK  attacks  Q}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "retimate",
+        "description": "cql() flipcolor{mate B -> k k -> B R -> B _ <- k == 3 square all x in _ <- k (B -> x) or (R -> x)}",
+        "query": "//cql()\n//flipcolor{mate\n//B -> k\n//k -> B\n//R -> B\n//_ <- k == 3\n\n//square all x in _ <- k\n//       (B -> x) or (R -> x)}\n\ncql() mate flipcolor shift flip {\n    Bd8 Rd1-7 kc7\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "rookmate",
+        "description": "Rook (box) mate: K+R vs bare K. The bare king is driven to the edge of the board, rook delivers check from rank or file, and the supporting friendly king (not a bishop!) covers the flight squares.",
+        "query": "// Rook (box) mate: K+R vs bare K. The bare king is driven to the\n// edge of the board, rook delivers check from rank or file, and the\n// supporting friendly king (not a bishop!) covers the flight squares.\n\ncql()\n\nflipcolor {\n    mate\n    R attacks k\n    [Aa] == 3                            // K + R + k only (no other material)\n    # (. attackedby k) <= 5              // bare king on edge or in corner\n    square all x in _ attackedby k\n        (R attacks x) or (K attacks x)\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "smotheredmate",
+        "description": "Checkmating Patterns CQL query (smotheredmate).",
+        "query": "/*black is in smothered mate:\n  the black king does attacks neither\n  an empty square nor a white piece\n*/\ncql()\nflipcolor{mate\nnot k  attacks  [A_]}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "suffocationmate",
+        "description": "Searches for the suffocationmate checkmate pattern.",
+        "query": "// Searches for the suffocationmate checkmate pattern.\n\n\n\n\ncql()\nflipcolor{\nmate\nN  attacks  k\n_  attackedby  k == 2\n\nsquare all x in _  attackedby  k\n       B  attacks  x\n       }\n\n\n//cql() mate flipcolor shift flip {\n//   Ne7 Bc3 kg8\n//}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "swallowtail",
+        "description": "Swallowtail (Guéridon) mate: queen orthogonally adjacent to king, mate, with two friendly pieces blocking the king's diagonal flight squares. King is not on the edge (5 empty neighbours).",
+        "query": "// Swallowtail (Guéridon) mate: queen orthogonally adjacent to king,\n// mate, with two friendly pieces blocking the king's diagonal flight\n// squares. King is not on the edge (5 empty neighbours).\n\ncql()\n\nflipcolor {\n    mate\n    Q attacks k\n    k attacks Q\n    ray orthogonal (Q k)\n    _ attackedby k == 5\n    # ([a] & . attackedby k) == 2\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "trianglemate",
+        "description": "Triangle mate: queen, rook, and king form a triangle. The queen is adjacent to the king and delivers the mate; the rook supports the queen from the queen's own file or rank (so the three pieces are non-collinear, hence the triangle).",
+        "query": "// Triangle mate: queen, rook, and king form a triangle. The queen is\n// adjacent to the king and delivers the mate; the rook supports the\n// queen from the queen's own file or rank (so the three pieces are\n// non-collinear, hence the triangle).\n\ncql()\n\nflipcolor {\n    mate\n    Q attacks k\n    k attacks Q\n    R attacks Q\n    ray orthogonal (R Q)\n    A attacks k == Q\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "twobishopmate",
+        "description": "Two-bishop mate: K+B+B vs bare K. Both bishops (on opposite colours) drive the bare king to a corner. The bishop pair plus supporting king cover every flight square.",
+        "query": "// Two-bishop mate: K+B+B vs bare K. Both bishops (on opposite colours)\n// drive the bare king to a corner. The bishop pair plus supporting king\n// cover every flight square.\n\ncql()\n\nflipcolor {\n    mate\n    [Aa] == 4                            // K + B + B + k only\n    B == 2\n    B attacks k\n    # (. attackedby k) == 3              // bare king in a corner\n    square all x in _ attackedby k\n        (B attacks x) or (K attacks x)\n}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "twoknightmate",
+        "description": "Searches for the twoknightmate checkmate pattern.",
+        "query": "// Searches for the twoknightmate checkmate pattern.\n\n\n\ncql()\nflipcolor{\nmate\nN  attacks  k\nN == 2}"
+    },
+    {
+        "category": "Checkmating Patterns",
+        "name": "vukovicmate",
+        "description": "vukovic mate",
+        "query": "// vukovic mate\n\n/*Vuković’s mate is a mate involving a protected rook which delivers checkmate to the king at the edge of the board, \nwhile a knight covers the remaining escape squares of the king. The rook is usually protected with either the king or a pawn*/\n\ncql() mate flipcolor shift flip {\n    Re7 Ne6 ke8\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "12pawnmoves",
+        "description": "search for largest number of consecutive pawn moves by one side",
+        "query": "// search for largest number of consecutive pawn moves by one side\n\ncql()"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "3knights",
+        "description": "Fun, Quirky & Geometric Themes CQL query (3knights).",
+        "query": "/* krabbe diary entry 49 */\n\n\ncql()\n\nflipcolor N == 3"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "4vs3",
+        "description": "R and 4 vs R and 3 with outside passed pawn",
+        "query": "// R and 4 vs R and 3 with outside passed pawn\n\n\ncql()\n\nR == 1\nr == 1\n[Aa] == 11\n\nflipcolor shift flip {\nP[a2-7]\nP[f2-7]\nP[g2-7]\nP[h2-7]\np[f2-7]\np[g2-7]\np[h2-7]\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "5queens",
+        "description": "https://www.chesshistory.com/winter/extra/fivequeens.html",
+        "query": "// https://www.chesshistory.com/winter/extra/fivequeens.html\n\ncql()\n\n[Qq] >= 5"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "HvdH-tablebase",
+        "description": "Fun, Quirky & Geometric Themes CQL query (HvdH-tablebase).",
+        "query": "/* How many positions in HvdH are start with 7 men? */\n\ncql()\n\n//initial [Aa] <= 7\ninitial flipcolor P == 1 and p == 1 and [Aa] == 4"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "Qsacmate",
+        "description": "Fun, Quirky & Geometric Themes CQL query (Qsacmate).",
+        "query": "/* Queen sac, followed by double check, followed by mate.\n\nReminicent of the game reti - tartakower vienna 1910\n*/\n\ncql()\n\nflipcolor {\nline quiet \n  --> move from Q to [a_] \n  --> move from a to Q\n  --> move from A to [Aa_]\n  --> A attacks k == 2\n  --> move from A to [Aa_]\n  --> mate}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "R4r3",
+        "description": "Searches for the R4r3 chess motif. mentioned in amateur to im",
+        "query": "// Searches for the R4r3 chess motif.\n// mentioned in amateur to im\n\ncql()\n\nline quiet <-- {\n    flipcolor flip {\n        P[a2-7] == 1\n        P[f-h2-7] == 3\n        connectedpawns == 6\n        p[f-h2-7] == 3\n        R == 1\n        r == 1\n        [Aa] == 11\n    }\n} {3,}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "R4r3gelfand",
+        "description": "Fun, Quirky & Geometric Themes CQL query (R4r3gelfand).",
+        "query": "cql()\n\nline quiet <-- {flipcolor flip {Pe2-7 Pf2-7 Pg2-7 Ph2-7 pf6 pg2-7 ph2-7\nR == 1\nr == 1\n[Aa] == 11\n}} {3,}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "RB",
+        "description": "Rook vs Bishop Endgame (with and without pawns)",
+        "query": "// Rook vs Bishop Endgame (with and without pawns)\n\ncql()\n\nflipcolor (R==1 and b==1) \n\n[Aa] == 4"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "Rpppp-connect",
+        "description": "silly thought",
+        "query": "// silly thought \n\ncql()\n\n(R == 1 and P == 0 and r == 0 and p == 4 and connectedpawns == 4) or \n(R == 0 and P == 4 and r == 1 and p == 0 and connectedpawns == 4)\n\nB == 0\nb == 0\nN == 0\nn == 0\nQ == 0\nq == 0"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "Rpppp",
+        "description": "rook vs 4 pawns",
+        "query": "// rook vs 4 pawns\n\ncql()\n\nflipcolor (R == 1 and P == 0 and connectedpawns == 4)\n\n[Aa] == 7"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "a2imRPbp",
+        "description": "the ending discussed in the book amateur to im",
+        "query": "// the ending discussed in the book amateur to im \n\ncql()\n\n\nline quiet <-- ({flipcolor{\n[Aa] == 6\nR == 1\nb == 1\nP == 1\np == 1\nray up (P p)\n}}) {3,}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "abcd",
+        "description": "Pawn capture detector: a pawn captured a piece on the move just played.",
+        "query": "// Pawn capture detector: a pawn captured a piece on the move just played.\n\ncql()\n\nflipcolor {\n    move from P capture a\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "absolutepinmate",
+        "description": "Searches for the absolutepinmate chess motif.",
+        "query": "// Searches for the absolutepinmate chess motif.\n\ncql()\n\nflipcolor {\n    pinningPieces = pin from A\n    pinnedPieces = pin through a\n\n    line --> pin from A\n         --> {\n                 wtm\n                 mate\n                 pin from A == pinningPieces\n                 pin through a != pinnedPieces\n             }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "attackedsquaremate",
+        "description": "Searches for the attackedsquaremate chess motif.",
+        "query": "// Searches for the attackedsquaremate chess motif.\n\ncql()\n\nflipcolor{\nline quiet \n  --> move from A to [a_] and a attacks A == 2\n  --> mate \n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "bad_bishop",
+        "description": "Bad bishop: A side has a bishop on a colour complex (light or dark squares) where many of its own pawns sit, restricting the bishop's mobility. Heuristic: the side has at least 4 pawns on the bishop's colour AND at least 2 more there than on the opposite colour.",
+        "query": "// Bad bishop:\n// A side has a bishop on a colour complex (light or dark squares) where\n// many of its own pawns sit, restricting the bishop's mobility.\n// Heuristic: the side has at least 4 pawns on the bishop's colour AND\n// at least 2 more there than on the opposite colour.\n\ncql(quiet)\n\nflipcolor {\n    {\n        #(light B) >= 1\n        #(light P) >= 4\n        #(light P) >= #(dark P) + 2\n        comment(\"Bad light-squared bishop: \" #(light P) \" light vs \" #(dark P) \" dark pawns\")\n    }\n    or\n    {\n        #(dark B) >= 1\n        #(dark P) >= 4\n        #(dark P) >= #(light P) + 2\n        comment(\"Bad dark-squared bishop: \" #(dark P) \" dark vs \" #(light P) \" light pawns\")\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "bad_knight",
+        "description": "Bad knight: \"A knight on the rim is dim\". A knight on the a- or h-file has at most 4 squares it can hop to. We flag a rim knight as \"bad\" when at most one of those squares is both unoccupied by a friendly piece AND not attacked by an enemy pawn — i.e., the knight has nowhere useful or safe to land.",
+        "query": "// Bad knight:\n// \"A knight on the rim is dim\". A knight on the a- or h-file has at\n// most 4 squares it can hop to. We flag a rim knight as \"bad\" when at\n// most one of those squares is both unoccupied by a friendly piece AND\n// not attacked by an enemy pawn — i.e., the knight has nowhere useful\n// or safe to land.\n\ncql(quiet)\n\nflipcolor {\n    piece $n in N {\n        $n & (N[a1-8] | N[h1-8])\n\n        $attacks = [Aa_] attackedby $n\n        $safe = $attacks & ~A & ~([Aa_] attackedby p)\n        #$safe <= 1\n\n        comment(\"Bad knight on rim: \" $n \" safe-moves=\" $safe)\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "bahr",
+        "description": "Bahr's rule -- KPP vs KP rook-pawn endings the rule calls drawn. https://www.arves.org/arves/index.php/en/endgamestudies/theory/1570-the-flaw-in-bahr-s-rule Bahr's rule covers a pawn ending with two blocked rook pawns plus one extra \"outside\" passed pawn for the stronger side. The rule says the position is a DRAW (the defender holds) when all three conditions hold: 1. The stronger side's rook pawn has NOT crossed the half-way line, i.e. it is no further than its own 4th rank. If it has, the stronger side wins. 2. The stronger side's king stands next to (is adjacent to) its passed pawn. 3. The defending king stands directly in front of the passed pawn, or directly in front of the attacking king. The rule is only a guideline: F. Santelli's position 8/8/8/8/p3k3/P7/4KP2/8 meets all three conditions yet is in fact won for the stronger side when the defender is to move (the John Crum manoeuvre) -- this is the \"flaw\" discussed in the ARVES article above. Because the rule itself says nothing about the side to move, this query matches the geometry regardless of whose turn it is, so the rare flawed positions are matched too.",
+        "query": "// Bahr's rule -- KPP vs KP rook-pawn endings the rule calls drawn.\n//\n// https://www.arves.org/arves/index.php/en/endgamestudies/theory/1570-the-flaw-in-bahr-s-rule\n//\n// Bahr's rule covers a pawn ending with two blocked rook pawns plus one extra\n// \"outside\" passed pawn for the stronger side. The rule says the position is a\n// DRAW (the defender holds) when all three conditions hold:\n//\n//   1. The stronger side's rook pawn has NOT crossed the half-way line, i.e. it\n//      is no further than its own 4th rank. If it has, the stronger side wins.\n//   2. The stronger side's king stands next to (is adjacent to) its passed pawn.\n//   3. The defending king stands directly in front of the passed pawn, or\n//      directly in front of the attacking king.\n//\n// The rule is only a guideline: F. Santelli's position 8/8/8/8/p3k3/P7/4KP2/8\n// meets all three conditions yet is in fact won for the stronger side when the\n// defender is to move (the John Crum manoeuvre) -- this is the \"flaw\" discussed\n// in the ARVES article above. Because the rule itself says nothing about the\n// side to move, this query matches the geometry regardless of whose turn it is,\n// so the rare flawed positions are matched too.\n\ncql()\n\n// Pure pawn endgame: kings and pawns only, three pawns in total.\n[QqRrBbNn] == 0\n[Pp] == 3\n\n// flipcolor    -> let either side be the stronger one. It mirrors ranks as well\n//                 as colours, so \"up\" below reads as \"down\" for the black case.\n// flipvertical -> let the rook pawns sit on the h-file as well as the a-file.\nflipcolor flipvertical {\n\n    // Material split: stronger side has two pawns, weaker side has one.\n    P == 2\n    p == 1\n\n    // Exactly one passed pawn: the stronger side's outside pawn. With the weaker\n    // side's only pawn blocked on the rook file, this passer must be White's.\n    passedpawns == 1\n    $passer = P & passedpawns\n\n    // --- Condition 1 ------------------------------------------------------\n    // Both sides have a rook pawn on the a-file (flipvertical mirrors the h-file\n    // case). The stronger side's rook pawn is its ONLY a-file pawn and has not\n    // crossed its 4th rank; requiring it to be the only one also forces the\n    // passer to be a genuine outside pawn rather than a doubled rook pawn.\n    Pa2-4\n    #(P & a1-8) == 1\n    pa2-7\n\n    // --- Condition 2 ------------------------------------------------------\n    // The attacking king is adjacent to its passed pawn.\n    K attacks $passer\n\n    // --- Condition 3 ------------------------------------------------------\n    // The defending king is directly in front of the passed pawn, or directly\n    // in front of the attacking king (same file, further up the board).\n    (k & (up 1 7 $passer)) or (k & (up 1 7 K))\n\n    comment(\"Bahr's rule: outside passer on \" $passer)\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "biggest_stalemate",
+        "description": "Fun, Quirky & Geometric Themes CQL query (biggest_stalemate).",
+        "query": "cql(quiet)\n\nsort \"stalemate with greatest stalemated-side material\" {\n  flipcolor {\n    btm\n    stalemate\n    power a\n  }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "blockcheckwithmate",
+        "description": "Check, then king move, then mate (king walked into a mating net).",
+        "query": "// Check, then king move, then mate (king walked into a mating net).\n\ncql()\n\nflipcolor {\n    line\n      --> check\n      --> move from K\n      --> mate\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "bodyguardN",
+        "description": "Fun, Quirky & Geometric Themes CQL query (bodyguardN).",
+        "query": "\\\\ the bodyguard knight article (chess magazine jan 2025)\n\ncql()\n\nflipcolor flip shift {Ke1 Ne2 qe3}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "breakthrough",
+        "description": "Fun, Quirky & Geometric Themes CQL query (breakthrough).",
+        "query": "cql()\n\nflipcolor flipvertical{\nPc3 Pb4 Pa4\npb6 pa5 pd5}\n\n[QqRrNnBb] == 0"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "castleaftermove40",
+        "description": "castling after move 40.",
+        "query": "// castling after move 40.\n\ncql() \n\nmove castle and movenumber>40"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "connected_passed_pawns",
+        "description": "Connected passed pawns: at least two passed pawns of the same colour on adjacent files in the same position. passedpawns -> set of all passed-pawn squares (either colour). We keep the white ones (P &), expand each to its full file, shift one file left/right to get the \"adjacency mask\", then keep only those passed pawns whose file is adjacent to another passed white pawn. flipcolor handles the symmetric black case.",
+        "query": "// Connected passed pawns: at least two passed pawns of the same colour\n// on adjacent files in the same position.\n//\n// passedpawns -> set of all passed-pawn squares (either colour).\n// We keep the white ones (P &), expand each to its full file, shift one\n// file left/right to get the \"adjacency mask\", then keep only those\n// passed pawns whose file is adjacent to another passed white pawn.\n// flipcolor handles the symmetric black case.\n\ncql(quiet)\n\nflipcolor {\n    $wpass = P & passedpawns\n\n    // Squares on a file that contains a white passed pawn.\n    $files = $wpass | up 1 7 $wpass | down 1 7 $wpass\n\n    // Squares on a file immediately adjacent to such a file.\n    $adj = (left 1 $files) | (right 1 $files)\n\n    // White passed pawns whose file is adjacent to another passed white pawn.\n    $cpp = $wpass & $adj\n    #$cpp >= 2\n\n    comment(\"Connected passed pawns: \" $cpp)\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "crosspin",
+        "description": "Searches for the crosspin chess motif.",
+        "query": "// Searches for the crosspin chess motif.\n\ncql()\n// Crosspin: a piece is pinned in two ways simultaneously by two different\n// attackers along two different rays - one absolute (to the king), one\n// relative (to another valuable black piece).\n\nflipcolor {\n    piece zz in [qrnbp] {\n        piece $w1 in [QRB] {\n            pin from $w1 through zz to k\n            piece $w2 in [QRB] {\n                pin from $w2 through zz to [qrnb] & ~zz\n                $w1 != $w2\n            }\n        }\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "double_attacked_mate",
+        "description": "Double-attacked mate: a mating move where some attacking piece sits on a square attacked by at least two opposing pieces (a piece walked into multiple attacks but still delivered mate).",
+        "query": "// Double-attacked mate: a mating move where some attacking piece sits\n// on a square attacked by at least two opposing pieces (a piece walked\n// into multiple attacks but still delivered mate).\n\ncql()\n\nflipcolor {\n    mate\n    piece $p in A {\n        $dest = $p\n        parent: (a attacks $dest) >= 2\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "doublebishopsac",
+        "description": "Fun, Quirky & Geometric Themes CQL query (doublebishopsac).",
+        "query": "cql()\n\nflipcolor flip\n\nline --> move to h7 from B capture p \n     --> move capture B\n     --> move to h5 from Q\n     --> move to _ from  k\n     --> move to g7 from B capture p"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "doublecheck",
+        "description": "Double check: at least two enemy pieces attack the side-to-move's king.",
+        "query": "// Double check: at least two enemy pieces attack the side-to-move's king.\n\ncql()\n\nflipcolor {\n    check\n    (A attacks k) >= 2\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "doublecheckANDmate",
+        "description": "Double check that is also checkmate.",
+        "query": "// Double check that is also checkmate.\n\ncql()\n\nflipcolor {\n    (A attacks k) >= 2\n    mate\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "doublerooksacrifice",
+        "description": "too general i think",
+        "query": "// too general i think\n\ncql()\n\nflipcolor\nresult 1-0\n\nline --> move capture R\n     --> move \n     --> move capture R"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "elasticband",
+        "description": "Elastic band trap (sketch): a knight pinned by an enemy bishop against a friendly bishop, followed by a sequence of captures that exploit the pin.",
+        "query": "// Elastic band trap (sketch): a knight pinned by an enemy bishop against\n// a friendly bishop, followed by a sequence of captures that exploit\n// the pin.\n\ncql()\n\nflipcolor {\n    piece $p in [bq] {\n        pin from $p through N to B\n        line\n          --> move from N capture a\n          --> move from $p capture B\n          --> move from N capture $p\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "evals",
+        "description": "finding the evaluations",
+        "query": "// finding the evaluations\n\ncql()\n\noriginalcomment \"eval\""
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "exchanges_on_g5",
+        "description": "Fun, Quirky & Geometric Themes CQL query (exchanges_on_g5).",
+        "query": "cql()\n\n\nflipcolor{\nkg8\nline --> move from p to g5\n     --> move from A capture g5\n     --> move from p capture g5\n     --> move from A capture g5\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "filterlosses",
+        "description": "Filter games whose Termination tag matches \"Normal\" (i.e., the game ended via mate/resignation/agreement rather than time forfeit or other unusual termination).",
+        "query": "// Filter games whose Termination tag matches \"Normal\" (i.e., the game\n// ended via mate/resignation/agreement rather than time forfeit or\n// other unusual termination).\n\ncql()\n\ntag \"Termination\" ~~ \"Normal\""
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "fischer_hedgehog_maneuvre",
+        "description": "Fischer's hedgehog regrouping: King to h1, Rook to g1, then the g4 pawn push (a kingside pawn-storm setup). The three moves must occur in THIS ORDER at some point in the game, but NOT necessarily on consecutive moves. `. {*}` is the gap: `.` (all squares) matches any position, and `{*}` repeats it zero or more times, so any number of unrelated moves may fall between the key moves. (Plain `-->` between two moves would force them to be consecutive.)",
+        "query": "// Fischer's hedgehog regrouping: King to h1, Rook to g1, then the g4 pawn push\n// (a kingside pawn-storm setup). The three moves must occur in THIS ORDER at\n// some point in the game, but NOT necessarily on consecutive moves.\n//\n// `. {*}` is the gap: `.` (all squares) matches any position, and `{*}` repeats\n// it zero or more times, so any number of unrelated moves may fall between the\n// key moves. (Plain `-->` between two moves would force them to be consecutive.)\n\ncql()\n\nflipcolor flip {\n    line\n        --> move from K to h1\n        --> . {*}\n        --> move from R to g1\n        --> . {*}\n        --> move from P to g4\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "fishingpole",
+        "description": "https://en.wikipedia.org/wiki/Fishing_Pole_Trap i don't think it should be a pawn on g5",
+        "query": "// https://en.wikipedia.org/wiki/Fishing_Pole_Trap\n// i don't think it should be a pawn on g5\n\ncql(quiet)\n\nflipcolor flip{\nline --> move from [QRBN] to g5\n     --> move from p to h6\n     --> move from P to h4}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "freespace",
+        "description": "Fun, Quirky & Geometric Themes CQL query (freespace).",
+        "query": "/*********************\nprint the amount of freespace around the king at each turn.\n**********************/\n\n\ncql()\n\nfreespaceWhite = {#_ attackedby K}\nfreespaceBlack = {#_ attackedby k}\n\ncomment (\"w:\" freespaceWhite \"b:\" freespaceBlack)"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "g5mate",
+        "description": "Searches for the g5mate chess motif.",
+        "query": "// Searches for the g5mate chess motif.\n\ncql()\n\nline --> move from [Pp] to g5\n     --> mate"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "greekgift",
+        "description": "Greek gift.",
+        "query": "// Greek gift.\n\ncql() result 1-0  ply < 40\npg7  killzone = f-h6-8\nline quiet\n  --> move from B capture ph7\n  --> move from k capture h7\n  --> .{2 12}\n  --> terminal and\n      (Ne-h5-8 == 2 or (R attacks killzone == 2 and not Q attacks killzone))"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "greekgift2",
+        "description": "Searches for the greekgift chess motif.",
+        "query": "// Searches for the greekgift chess motif.\n\ncql()\n\nflipcolor flip\n\nline --> move to h7 from B capture p \n     --> move capture B\n     --> move to g5 from N"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "halloween",
+        "description": "Halloween Gambit: 1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5 Detects the position after White's Nxe5 sacrifice.",
+        "query": "// Halloween Gambit: 1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6 4.Nxe5\n// Detects the position after White's Nxe5 sacrifice.\n\ncql()\n\nmove from N capture p to e5\nparent: { Pe4 Pe5==0 Nc3 Nf3 Nc6 Nf6 }"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "imbalance",
+        "description": "Material imbalance: positions where white and black total piece power differs by at least 2 (e.g., one side has an extra minor piece).",
+        "query": "// Material imbalance: positions where white and black total piece power\n// differs by at least 2 (e.g., one side has an extra minor piece).\n\ncql()\n\npower [Aa] >= 1\nabs(power A - power a) >= 2"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "ismate",
+        "description": "Detect positions where the side to move is checkmated.",
+        "query": "// Detect positions where the side to move is checkmated.\ncql()\n\nmate\n\ncomment(\"ismate\")"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "kingsidecastlemate",
+        "description": "Searches for the kingsidecastlemate chess motif.",
+        "query": "// Searches for the kingsidecastlemate chess motif.\n\ncql()\n\nline --> move o-o\n     --> mate"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "knightinthecorner",
+        "description": "Fun, Quirky & Geometric Themes CQL query (knightinthecorner).",
+        "query": "/* \nHow does the value of the knight go down when the knight steps into the corner?\n*/\n\ncql()\n// quite a lot of them are the knight taking something, so what if that square were empty?\nflip flipcolor (move from N to a1) and (move from N to _)\n\n\n// what about the \"dumb square\"?\n//flip flipcolor move from N to b2"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "knightontherim",
+        "description": "Fun, Quirky & Geometric Themes CQL query (knightontherim).",
+        "query": "/* \nHow does the value of the knight go down when the knight steps onto the rim?\n*/\n\ncql()\n\nflip flipcolor move from N to a-h8"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "knights_tour",
+        "description": "Knight tour (approximate): one knight makes many moves over the course of the game (consecutive or interleaved). Sorted by move count by that knight.",
+        "query": "// Knight tour (approximate): one knight makes many moves over the\n// course of the game (consecutive or interleaved). Sorted by move\n// count by that knight.\n\ncql(quiet)\n\nflipcolor {\n    piece $n in N {\n        sort \"knight tour length (moves)\"\n        line --> (move from $n --> .) {6,63}\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "krabbeboatmate",
+        "description": "Fun, Quirky & Geometric Themes CQL query (krabbeboatmate).",
+        "query": "/* \ndiary entry 355 of tim krabbe's diary\n*/\n\n\ncql()\n\nflipcolor shift { mate Nc7 Bd6 Be6 Nf7 kd7 }"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "krabbeboatmatebig",
+        "description": "Fun, Quirky & Geometric Themes CQL query (krabbeboatmatebig).",
+        "query": "/* \ndiary entry 355 of tim krabbe's diary\n*/\n\n\ncql()\n\nflipcolor shift { mate Nb7 Bd6 Be6 Ng7 kd7 }"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "krabbebreakthrough",
+        "description": "Breakthrough theme documented by Tim Krabbe in diary entries 322 and 392. https://timkr.home.xs4all.nl/chess2/diary17txt.htm https://timkr.home.xs4all.nl/chess2/diarytxt.htm",
+        "query": "// Breakthrough theme documented by Tim Krabbe in diary entries 322 and 392.\n// https://timkr.home.xs4all.nl/chess2/diary17txt.htm\n// https://timkr.home.xs4all.nl/chess2/diarytxt.htm\n\ncql()\n\n[QqRrBbNn] == 0\nflip flipcolor { \n    btm\n    Pf3 Pg4 Ph4 \n    pe5 ph5 pg6 \n    pf2-7 == 0\n    ke6\n    }"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "lalic",
+        "description": "inspired by the game P Lalic - M Grigorian, 2022 find all positions with wNa8, wBc7, bKc8, wRd1 e.g N1kR1b1r/p1B1ppp1/1pp1n3/5B1p/6nP/8/PPP2PP1/2K5 b - - 1 22 add shift?",
+        "query": "// inspired by the game P Lalic - M Grigorian, 2022\n// find all positions with wNa8, wBc7, bKc8, wRd1\n// e.g N1kR1b1r/p1B1ppp1/1pp1n3/5B1p/6nP/8/PPP2PP1/2K5 b - - 1 22\n// add shift?\n\ncql()\nflipcolor flip {Na8 Bc7 Kc8 Rd8}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "legal",
+        "description": "Searches for the legal chess motif. chess magazine jan 2023 & feb 2023",
+        "query": "// Searches for the legal chess motif.\n// chess magazine jan 2023 & feb 2023 \n\n\ncql()\nflipcolor flip{\nresult 1-0\nline quiet\n  --> move from N to e5\n  --> move from b capture Qd1}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "manual-castling",
+        "description": "find instances where manual castling occurs.",
+        "query": "// find instances where manual castling occurs.\n\ncql()\n\nnot find <-- move castle\nK[g1,c1]"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "matewithking",
+        "description": "Searches for the matewithking chess motif.",
+        "query": "// Searches for the matewithking chess motif.\n\ncql()\n\nline --> move from K to _\n     --> mate"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "matewithpawn",
+        "description": "Searches for the matewithpawn chess motif.",
+        "query": "// Searches for the matewithpawn chess motif.\n\ncql()\n\nline --> move to _ from [Pp]\n     --> mate"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "max_consecutive_captures",
+        "description": "Max consecutive captures: orders games by the longest streak of consecutive capturing moves (either side).",
+        "query": "// Max consecutive captures: orders games by the longest streak of\n// consecutive capturing moves (either side).\n\ncql(quiet)\n\nsort \"max consecutive captures\"\nline\n  --> move capture [Aa] {3 100}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "max_consecutive_checks",
+        "description": "Max consecutive checks: orders games by the longest streak of consecutive checking moves.",
+        "query": "// Max consecutive checks: orders games by the longest streak of\n// consecutive checking moves.\n\ncql(quiet)\n\nsort \"max consecutive checks\"\nline\n  --> check {3 100}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "max_consecutive_noncaptures",
+        "description": "Max consecutive non-captures: orders games by the longest streak of consecutive non-capturing moves (either side).",
+        "query": "// Max consecutive non-captures: orders games by the longest streak\n// of consecutive non-capturing moves (either side).\n\ncql(quiet)\n\nsort \"max consecutive non-captures\"\nline\n  --> not move capture [Aa] {5 200}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "max_consecutive_promotions",
+        "description": "Max consecutive promotions: orders games by the longest streak of consecutive promotion moves.",
+        "query": "// Max consecutive promotions: orders games by the longest streak of\n// consecutive promotion moves.\n\ncql(quiet)\n\nsort \"max consecutive promotions\"\nline\n  --> move promote [QRBNqrbn] {2 32}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "miniature",
+        "description": "Searches for the miniature chess motif.",
+        "query": "// Searches for the miniature chess motif.\n\ncql()\nmate and movenumber <= 25"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "most_hanging",
+        "description": "Most hanging pieces in a single position. A piece is \"hanging\" if it is attacked by the opponent and not defended by any of its own side's pieces. We count hanging pieces of either colour in each position, then sort games by the largest count seen anywhere in the game. The 'sort' filter: - sorts matching games by the best (max) value of its target - smart-comments keep the per-game comment only for the peak position",
+        "query": "// Most hanging pieces in a single position.\n//\n// A piece is \"hanging\" if it is attacked by the opponent and not\n// defended by any of its own side's pieces. We count hanging pieces\n// of either colour in each position, then sort games by the largest\n// count seen anywhere in the game.\n//\n// The 'sort' filter:\n//   - sorts matching games by the best (max) value of its target\n//   - smart-comments keep the per-game comment only for the peak position\n\ncql(quiet)\n\nsort \"max hanging pieces\" {\n    // Squares of white pieces attacked by black, not defended by white\n    $hang_white = (A attackedby a) & ~(A attackedby A)\n    // Squares of black pieces attacked by white, not defended by black\n    $hang_black = (a attackedby A) & ~(a attackedby a)\n    // Union of both sides' hanging pieces\n    $hanging = $hang_white | $hang_black\n    $count = #$hanging\n\n    // Only games with at least one hanging piece in some position\n    $count >= 1\n\n    comment(\"Hanging (\" $count \"): \" $hanging)\n    $count\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "most_visited_square",
+        "description": "Most-visited square (per game). Sort games by the longest streak of moves that all touch the same square — ranks games where one square is the focal point of play.",
+        "query": "// Most-visited square (per game).\n//\n// Sort games by the longest streak of moves that all touch the same\n// square — ranks games where one square is the focal point of play.\n\ncql(quiet)\n\nsort \"max same-square visits\"\nsquare $sq in [Aa_] {\n    line --> (move to $sq or move from $sq) {3 200}\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "nocapturebeforemove30",
+        "description": "Searches for the nocapturebeforemove30 chess motif.",
+        "query": "// Searches for the nocapturebeforemove30 chess motif.\n\ncql()\n\n(move capture [Aa] and movenumber>30) and (not move capture [Aa] and movenumber<30)"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "octopus",
+        "description": "Searches for the octopus chess motif.",
+        "query": "// Searches for the octopus chess motif.\n\ncql()\n\nNa-h6"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "one_piece_opening_streak",
+        "description": "Same-piece opening streak: a single piece is moved multiple times in a row by its side during the opening (first 12 full moves).",
+        "query": "// Same-piece opening streak: a single piece is moved multiple times\n// in a row by its side during the opening (first 12 full moves).\n\ncql(quiet)\n\npiece $Repeater in [Aa] {\n    sort \"one-piece opening streak\"\n    line singlecolor\n      --> (move from $Repeater and movenumber <= 12) {3 12}\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "only-move-mate",
+        "description": "Only-move mate: the side delivering mate had exactly one legal move, and that move was the mate (forced into mating).",
+        "query": "// Only-move mate: the side delivering mate had exactly one legal move,\n// and that move was the mate (forced into mating).\n\ncql()\n\nmate\nparent: { move legal count == 1 }"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "onlymoveep",
+        "description": "Fun, Quirky & Geometric Themes CQL query (onlymoveep).",
+        "query": "/* only legal move is en passant */\ncql()\n\nmove enpassant\nmove legal count == 1"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "onlymovemate",
+        "description": "Searches for the onlymovemate chess motif.",
+        "query": "// Searches for the onlymovemate chess motif.\n\ncql()\n\nmate\nparent : move count legal == 1"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "oppositesidecastling",
+        "description": "Searches for the oppositesidecastling chess motif.",
+        "query": "// Searches for the oppositesidecastling chess motif.\n\ncql()\n\n// white castles kingside and black castles queenside\nmove from Ke1 to g1 and move from ke8 to c8 and result 1-0\n// white castles queenside and black castles kingside\nmove from Ke1 to c1 and move from ke8 to g8 and result 0-1"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "outpost",
+        "description": "Outpost -- https://en.wikipedia.org/wiki/Outpost_(chess) An outpost is a square on the player's 4th-7th rank that is defended by a friendly pawn and can never be attacked by an enemy pawn. A knight parked on one is the classic powerful outpost. This finds positions where a knight stands on an outpost; flipcolor covers both colours. To look for other pieces on an outpost, change \"N\" below to e.g. [NB] or [NBR] (rooks excel on flank-file outposts, bishops on central ones).",
+        "query": "// Outpost -- https://en.wikipedia.org/wiki/Outpost_(chess)\n//\n// An outpost is a square on the player's 4th-7th rank that is defended by a\n// friendly pawn and can never be attacked by an enemy pawn. A knight parked on\n// one is the classic powerful outpost. This finds positions where a knight\n// stands on an outpost; flipcolor covers both colours.\n//\n// To look for other pieces on an outpost, change \"N\" below to e.g. [NB] or\n// [NBR] (rooks excel on flank-file outposts, bishops on central ones).\n\ncql()\n\nflipcolor {\n    // Is there a White knight standing on an outpost square?\n    piece $n in N {\n\n        // (1) On White's 4th-7th rank.\n        $n & a-h4-7\n\n        // (2) Defended by at least one White pawn.\n        $n attackedby P\n\n        // (3) No Black pawn can ever attack it. The squares from which a black\n        //     pawn could (now, or after advancing) attack $n are the two\n        //     adjacent files in front of it: start from where such a pawn would\n        //     stand to attack $n (its NE/NW neighbours) and extend up the board.\n        not (p & (up 0 7 ((northeast 1 1 $n) | (northwest 1 1 $n))))\n\n        comment(\"Knight outpost on \" $n)\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "pawnwall",
+        "description": "Searches for the pawnwall chess motif.",
+        "query": "// Searches for the pawnwall chess motif.\n\ncql()\n\nflipcolor flip Pa4 Pb4 Pc4 Pd4 Pe4 Pf4 Pg4 Ph4"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "pieceonstartingsquaremate",
+        "description": "Fun, Quirky & Geometric Themes CQL query (pieceonstartingsquaremate).",
+        "query": "/* \ncheckmate with a piece ending on its starting square \n\ne.g Qd1 mate Nb1 mate \n\nTODO there must be a cleaner way of doing this where we can loop over all the pieces and associate a starting square with them.\n*/\n\ncql()\n\nsquare StartSquare in a-h1 {\n    initial A StartSquare\n    //mate\n    parent: move from A to StartSquare\n    }"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "promotion_sacrifices",
+        "description": "make a move which sacrifices material temporarily to get a promotion",
+        "query": "// make a move which sacrifices material temporarily to get a promotion\n\ncql()"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "quadrupled-pawns",
+        "description": "n-pled pawns",
+        "query": "// n-pled pawns\n\ncql()\n\nflipcolor shift (P[a2-7] == 4)"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "queensidecastlemate",
+        "description": "Searches for the queensidecastlemate chess motif.",
+        "query": "// Searches for the queensidecastlemate chess motif.\n\ncql()\n\nline --> move o-o-o\n     --> mate"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "qvs2r_loss",
+        "description": "when a queen loses to two rooks",
+        "query": "// when a queen loses to two rooks\n\ncql()\n\nflipcolor{\n    result 1-0\n    Q == 0 \n    q == 1 \n    R == 2 \n    r == 0\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "ramblingrook",
+        "description": "Rambling rook: stalemate where the previous move was a black piece capturing a white rook (the rook had wandered into the wrong place).",
+        "query": "// Rambling rook: stalemate where the previous move was a black piece\n// capturing a white rook (the rook had wandered into the wrong place).\n\ncql()\n\nflipcolor {\n    stalemate\n    parent: { move from a to R }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "return_mate",
+        "description": "Return-to-starting-square mate: the mating move puts a non-king, non-pawn piece back on the EXACT square it occupied in the initial position (same physical piece, not merely a piece of the same type).",
+        "query": "// Return-to-starting-square mate: the mating move puts a non-king,\n// non-pawn piece back on the EXACT square it occupied in the initial\n// position (same physical piece, not merely a piece of the same type).\n\ncql()\n\nflipcolor {\n    initial\n    piece $a1r = Ra1\n    piece $h1r = Rh1\n    piece $b1n = Nb1\n    piece $g1n = Ng1\n    piece $c1b = Bc1\n    piece $f1b = Bf1\n    piece $d1q = Qd1\n\n    find {\n        mate\n        (move previous from $a1r to a1) or\n        (move previous from $h1r to h1) or\n        (move previous from $b1n to b1) or\n        (move previous from $g1n to g1) or\n        (move previous from $c1b to c1) or\n        (move previous from $f1b to f1) or\n        (move previous from $d1q to d1)\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "rook_homerun",
+        "description": "Rook homerun: a single rook visits all four corners in order a1, h1, h8, a8. Other pieces may move between visits, but the tracked rook itself stays on each corner until the next jump (no off-corner wandering between visits).",
+        "query": "// Rook homerun: a single rook visits all four corners in order\n// a1, h1, h8, a8. Other pieces may move between visits, but the\n// tracked rook itself stays on each corner until the next jump\n// (no off-corner wandering between visits).\n\ncql(quiet)\n\nflipcolor {\n    piece $r in R {\n        line\n          --> move from $r to a1\n          --> move from ~$r {0 200}\n          --> move from $r to h1\n          --> move from ~$r {0 200}\n          --> move from $r to h8\n          --> move from ~$r {0 200}\n          --> move from $r to a8\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "rook_homerun_strict",
+        "description": "Rook homerun (strict): a single rook reaches every corner - a1, h1, h8, a8 - on four consecutive turns of its own side. Only the opposing side's response separates the four corner moves; no other moves by the rook's own side may occur between them.",
+        "query": "// Rook homerun (strict): a single rook reaches every corner -\n// a1, h1, h8, a8 - on four consecutive turns of its own side.\n// Only the opposing side's response separates the four corner moves;\n// no other moves by the rook's own side may occur between them.\n\ncql(quiet)\n\nflipcolor {\n    piece $r in R {\n        line\n          --> move from $r to a1\n          --> .\n          --> move from $r to h1\n          --> .\n          --> move from $r to h8\n          --> .\n          --> move from $r to a8\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "rookf7uncastled",
+        "description": "rook f7 sac may chess magazine 2023 & june 2023",
+        "query": "// rook f7 sac may chess magazine 2023 & june 2023\ncql()\nflipcolor{\nke8\nline --> move from R capture pf7\n     --> move capture Rf7}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "tkachenko",
+        "description": "Fun, Quirky & Geometric Themes CQL query (tkachenko).",
+        "query": "cql()\n\nline <-- ({\n    flipcolor(result 1-0 and A == 2 and \n    a > 2 and power A < power a)}) {3,}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "trappedknight",
+        "description": "Searches for the trappedknight chess motif.",
+        "query": "// Searches for the trappedknight chess motif.\n\n\ncql()\n\n(move legal from B count) > 8 and (B > 1)"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "triangulation",
+        "description": "Find king triangulation patterns. A triangulation is a king maneuver where the king moves to 3 different squares forming a triangle and returns to its starting square. Pattern: K@A -> K@B -> K@C -> K@A (3 king moves, A != B != C) We detect this at the position right after the third king move. At that position, going back through the parent chain: current (P):    K@A, just after K_C->A parent (P-1):   K@C, side-that-triangulated about to play K_C->A parent^3 (P-3): K@B, same side about to play K_B->C parent^5 (P-5): K@A, same side about to play K_A->B  [START]",
+        "query": "// Find king triangulation patterns.\n//\n// A triangulation is a king maneuver where the king moves to 3 different\n// squares forming a triangle and returns to its starting square.\n// Pattern: K@A -> K@B -> K@C -> K@A (3 king moves, A != B != C)\n//\n// We detect this at the position right after the third king move.\n// At that position, going back through the parent chain:\n//   current (P):    K@A, just after K_C->A\n//   parent (P-1):   K@C, side-that-triangulated about to play K_C->A\n//   parent^3 (P-3): K@B, same side about to play K_B->C\n//   parent^5 (P-5): K@A, same side about to play K_A->B  [START]\n\ncql(quiet)\n\nflipcolor {\n    // The previous move must have been a (white) king move.\n    // 'previous' makes K evaluate at the parent position, so this checks\n    // the move's from-square was where the white king stood before moving.\n    move previous from K\n\n    // King's three squares\n    $A = K                                       // current king square (= start of triangle)\n    $C = parent:K                                // king square before last move\n    $B = parent:parent:parent:K                  // king square at the white turn before that\n    $start_pos = parent:parent:parent:parent:parent  // 5 plies ago: where it all began\n\n    // King was on the same square 5 plies ago, with same side (white) to move\n    $start_pos:K == $A\n    $start_pos:wtm\n\n    // The three squares form a real triangle (all different)\n    $A != $B\n    $A != $C\n    $B != $C\n\n    comment \"King triangulation\"\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "triangulation_general",
+        "description": "Find triangulation by any piece (king, queen, rook, or bishop). Pawns can't move backwards, and knights always change square color in 3 moves -> they can never triangulate. So we restrict to K, Q, R, B. We use piece tracking (piece variables preserve a piece's identity across positions even when there are multiple pieces of the same type) to follow one specific piece through 3 moves. Pattern detected at the position right after the third move: start_pos (P-5): piece on square A, side X to move P-4..P-3:        side X plays piece A->B P-2..P-1:        side X plays piece B->C current  (P):    side X plays piece C->A   <- we are here",
+        "query": "// Find triangulation by any piece (king, queen, rook, or bishop).\n// Pawns can't move backwards, and knights always change square color\n// in 3 moves -> they can never triangulate. So we restrict to K, Q, R, B.\n//\n// We use piece tracking (piece variables preserve a piece's identity across\n// positions even when there are multiple pieces of the same type) to follow\n// one specific piece through 3 moves.\n//\n// Pattern detected at the position right after the third move:\n//   start_pos (P-5): piece on square A, side X to move\n//   P-4..P-3:        side X plays piece A->B\n//   P-2..P-1:        side X plays piece B->C\n//   current  (P):    side X plays piece C->A   <- we are here\n\ncql(quiet)\n\nflipcolor {\n    // Iterate over each white K/Q/R/B currently on the board\n    piece $p in [KQRB] {\n\n        // $p is on the board at parent and at current, and just moved\n        $A = $p                          // current square (must equal start)\n        $C = parent:$p                   // square before last move\n        $A & .                           // piece exists now\n        $C & .                           // piece existed at parent\n        $A != $C                         // last move actually moved $p\n\n        // The previous \"white to move\" turn (3 plies back)\n        $B = parent:parent:parent:$p\n        $B & .                           // piece existed then\n        $B != $C                         // moved between B-turn and C-turn\n\n        // Position 5 plies ago: where triangulation began\n        $start_pos = parent:parent:parent:parent:parent\n        $start_pos:$p == $A              // piece was on the same square A then\n\n        // Three different squares -> a real triangle\n        $A != $B\n\n        // The starting position was the same side-to-move\n        $start_pos:wtm\n\n        // Piece must have been the same (non-pawn) type at start\n        // (excludes a pawn promoting mid-pattern)\n        // type values: 1=pawn, 2=knight, 3=bishop, 4=rook, 5=queen, 6=king\n        $start_pos:type $p >= 3\n\n        comment(\"Triangulation by \" $p)\n    }\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "troitsky",
+        "description": "Troitsky line — positions where black pawns are behind the winning line for the two-knights-vs-pawn endgame, as defined by Troitsky. TODO: add the condition that the knight blockades the square in front of the pawn.",
+        "query": "// Troitsky line — positions where black pawns are behind the winning\n// line for the two-knights-vs-pawn endgame, as defined by Troitsky.\n//\n// TODO: add the condition that the knight blockades the square in\n// front of the pawn.\n\ncql()\n\n// Exactly 5 pieces on board (2 kings + 2 knights + 1 pawn)\n[Aa] == 5\n\nflipcolor {\n    wtm\n    N == 2\n    (p[a4-7] or\n     p[h4-7] or\n     p[b6-7] or\n     p[g6-7] or\n     p[c5-7] or\n     p[f5-7] or\n     p[d4-7] or\n     p[e4-7])\n}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "underdog",
+        "description": "290: losses in (queen) and pawn endings where the side with less pawns wins want to avoid positions where it's temporary (like a pawn capture in a pawn ending)",
+        "query": "// 290: losses in (queen) and pawn endings where the side with less pawns wins\n// want to avoid positions where it's temporary (like a pawn capture in a pawn ending)\n\ncql()\n\nline <-- ({\n    flipcolor {result 1-0 power A < power a}\n    [QqRrBbNn] == 0\n}) {3,}"
+    },
+    {
+        "category": "Fun, Quirky & Geometric Themes",
+        "name": "underpromotion",
+        "description": "Underpromotion: any pawn promotion that is NOT to a queen (i.e., to a rook, bishop, or knight).",
+        "query": "// Underpromotion: any pawn promotion that is NOT to a queen\n// (i.e., to a rook, bishop, or knight).\n\ncql(quiet)\n\nmove promote [RBNrbn]"
+    },
+    {
+        "category": "100gm",
+        "name": "diamond",
+        "description": "100gm CQL query (diamond).",
+        "query": "cql()\n\n\nflipcolor flip{\nPf2 Pf4 Pe3 Pd4\nPg2-7 == 0\n}"
+    },
+    {
+        "category": "100gm",
+        "name": "exchange",
+        "description": "100gm CQL query (exchange).",
+        "query": "cql()\n\nflipcolor{\n\n}"
+    },
+    {
+        "category": "100gm",
+        "name": "fianchettoh4",
+        "description": "100gm CQL query (fianchettoh4).",
+        "query": "cql()\n\nflipcolor flip{\npf7 pg6 ph7 kg8\n\nline --> move from P to h4\n}"
+    },
+    {
+        "category": "100gm",
+        "name": "nd3",
+        "description": "100gm CQL query (nd3).",
+        "query": "cql()\n\nflipcolor{\npa7 pb7 pd5 pe6 pf7 pg7 ph7\np == 7\nPa2 Pb2 Pc3 Pd4 Pf2 Pg2 Ph2\nP == 7\nNd3}"
+    },
+    {
+        "category": "100gm",
+        "name": "ng6g3",
+        "description": "100gm CQL query (ng6g3).",
+        "query": "cql(quiet)\n\n\nflipcolor flip{\nline --> move from N to g3\n     --> move from p to g6\n}"
+    },
+    {
+        "category": "100gm",
+        "name": "qg4",
+        "description": "100gm CQL query (qg4).",
+        "query": "cql()\n\nflipcolor{\nPa2 Pb2 Pc3 Pe5 Pf2 Pg2 Ph2\npa7 pb7 pd5 pe6 pf7 pg7 ph7\nline --> move from Q to g4\n}"
+    },
+    {
+        "category": "100gm",
+        "name": "rat",
+        "description": "100gm CQL query (rat).",
+        "query": "cql(quiet)\n\n\nflipcolor{\nline --> move from Q capture qd8\n     --> move from k capture Qd8\n}"
+    },
+    {
+        "category": "a0",
+        "name": "attack_rays",
+        "description": "a0 CQL query (attack_rays).",
+        "query": "//\n\n\ncql()\n\nflipcolor{\n(kg8 and xray([RQ] g7) and xray([QB] g7))\n}"
+    },
+    {
+        "category": "a0",
+        "name": "h5g5",
+        "description": "a0 CQL query (h5g5).",
+        "query": "cql()\n\nflipcolor flip {kg8 pf7 pg7 ph6 Ph5\nmove Pg5}"
+    },
+    {
+        "category": "a0",
+        "name": "kh1",
+        "description": "a0 CQL query (kh1).",
+        "query": "cql()\n\nflipcolor{Kh1 Rg1 Ph2 Pf2 Pf3}"
+    },
+    {
+        "category": "a0",
+        "name": "ng5motif",
+        "description": "a0 CQL query (ng5motif).",
+        "query": "cql()\n\nflipcolor\n\npf7 pg7 ph7\nkg8\nPh4\nmove N to g5"
+    },
+    {
+        "category": "krabbe-chess-curiosities",
+        "name": "bad-knight",
+        "description": "krabbe-chess-curiosities CQL query (bad-knight).",
+        "query": "cql()\n\nflipcolor flip {Na1 Pb3 Pc2}"
+    },
+    {
+        "category": "krabbe-chess-curiosities",
+        "name": "unguarded_guard",
+        "description": "Unguarded guard: A line-check is parried by interposing a piece on a square that is not defended by any of the defender's other pieces — the \"guard\" itself is unguarded. 1. parent:check, not check       -> the played move resolved a check 2. piece $checker in [rbq]       -> the checker was a sliding piece (flipcolor symmetric) 3. parent:($checker attacks K)   -> $checker was attacking the white king at parent 4. $line = parent: between(...)  -> squares strictly between checker and king at parent 5. $block = $line minus squares attacked by white at current (the interposed piece is not defended by any other white piece — a piece never attacks its own square, so the blocker itself does not appear as a defender) 6. parent: (move to $block)      -> the move played from parent landed on such a square",
+        "query": "// Unguarded guard:\n// A line-check is parried by interposing a piece on a square that is\n// not defended by any of the defender's other pieces — the \"guard\"\n// itself is unguarded.\n//\n//   1. parent:check, not check       -> the played move resolved a check\n//   2. piece $checker in [rbq]       -> the checker was a sliding piece (flipcolor symmetric)\n//   3. parent:($checker attacks K)   -> $checker was attacking the white king at parent\n//   4. $line = parent: between(...)  -> squares strictly between checker and king at parent\n//   5. $block = $line minus squares attacked by white at current\n//      (the interposed piece is not defended by any other white piece —\n//       a piece never attacks its own square, so the blocker itself\n//       does not appear as a defender)\n//   6. parent: (move to $block)      -> the move played from parent landed on such a square\n\ncql(quiet)\n\nflipcolor {\n    parent:check\n    not check\n\n    piece $checker in [rbq] {\n        parent: ($checker attacks K)\n\n        $line = parent: between($checker K)\n        $block = $line & ~(. attackedby A)\n\n        parent: (move to $block)\n\n        comment(\"Unguarded guard: blocked check by \" $checker \" on \" $block)\n    }\n}"
+    },
+    {
+        "category": "minis",
+        "name": "mini_no_sac",
+        "description": "miniatures where the side which wins doesn't sacrifice anything",
+        "query": "// miniatures where the side which wins doesn't sacrifice anything"
+    },
+    {
+        "category": "minis",
+        "name": "mini_sac",
+        "description": "Searches for the miniature with a sacrifice of some kind",
+        "query": "// Searches for the miniature with a sacrifice of some kind\n\ncql()\nmovenumber <= 25\nflipcolor{btm mate and power a - power A > 5}"
+    },
+    {
+        "category": "sakaev_landa",
+        "name": "attack_on_uncastledking",
+        "description": "Attack on the uncastled king (Sakaev & Landa): the winning side checkmates an enemy king that never castled, early in the game -- the king is caught in the centre before it can get to safety.",
+        "query": "// Attack on the uncastled king (Sakaev & Landa): the winning side checkmates\n// an enemy king that never castled, early in the game -- the king is caught in\n// the centre before it can get to safety.\n\ncql()\n\nflipcolor {\n    result 1-0\n    mate\n    movenumber < 25\n\n    // The mated side never castled anywhere in the game.\n    //   find <--          searches the ancestors of the (mate) position;\n    //   {btm move castle}  matches an ancestor where it is the loser's turn\n    //                      (btm) and the move actually played there is a castle.\n    // The braces are required: without them find would bind to btm alone and\n    // \"move castle\" would leak out as a separate filter.\n    not find <-- {btm move castle}\n}"
+    },
+    {
+        "category": "sakaev_landa",
+        "name": "drawing_out_king",
+        "description": "sakaev_landa CQL query (drawing_out_king).",
+        "query": "cql()\n\nflipcolor {\n    result 1-0\n    kg7\n    line --> move from A to f6\n         --> move from k capture f6\n         --> move from A to e5\n         --> move from k capture e5\n}"
+    },
+    {
+        "category": "sakaev_landa",
+        "name": "opening",
+        "description": "sakaev_landa CQL query (opening).",
+        "query": "cql()\n\nmate and movenumber <= 25"
+    },
+    {
+        "category": "weaknesses",
+        "name": "backward",
+        "description": "weaknesses CQL query (backward).",
+        "query": ""
+    },
+    {
+        "category": "weaknesses",
+        "name": "doubled",
+        "description": "doubled pawns",
+        "query": "// doubled pawns\n\ncql()\n\nflipcolor shift (P[a2-7] == 2)"
+    },
+    {
+        "category": "weaknesses",
+        "name": "holes",
+        "description": "weaknesses CQL query (holes).",
+        "query": "cql()"
+    },
+    {
+        "category": "weaknesses",
+        "name": "isolated",
+        "description": "weaknesses CQL query (isolated).",
+        "query": "cql()\n\nisolatedpawns"
+    },
+    {
+        "category": "weaknesses",
+        "name": "tripled-pawns",
+        "description": "tripled pawns",
+        "query": "// tripled pawns\n\ncql()\n\nflipcolor shift (P[a2-7] == 3)"
     }
 ]

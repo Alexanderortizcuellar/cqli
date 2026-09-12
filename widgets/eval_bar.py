@@ -44,6 +44,7 @@ class EvalBar(QWidget):
     def minimumSizeHint(self):
         # Provide a sane default footprint
         from PyQt5.QtCore import QSize
+
         return QSize(20, 200)
 
     # --- property to animate ----------------------------------------------------
@@ -87,7 +88,7 @@ class EvalBar(QWidget):
             # Clamp and map with a smooth logistic so motion is pleasing
             cp = max(-2000, min(2000, sval))
             white_share = 1.0 / (1.0 + math.exp(-cp / self._cp_scale))
-            self._score_text = f"{cp/100:+.2f}"
+            self._score_text = f"{cp / 100:+.2f}"
         elif stype == "mate":
             sval = int(score.get("value", 0))
             if sval > 0:
@@ -130,11 +131,13 @@ class EvalBar(QWidget):
         total_h = r.height()
         if total_h <= 0 or r.width() <= 0:
             return
-            
+
         font_size = max(6, int(total_h * 0.035))
-        if font_size > 11: font_size = 11
-        
+        if font_size > 11:
+            font_size = 11
+
         from PyQt5.QtGui import QFontMetrics
+
         max_allowed_w = max(10, r.width() - 4)
         while font_size > 5:
             font = QFont("Arial", font_size, QFont.DemiBold)
@@ -146,7 +149,7 @@ class EvalBar(QWidget):
             if text_w <= max_allowed_w:
                 break
             font_size -= 1
-            
+
         self._score_font = QFont("Arial", font_size, QFont.DemiBold)
         self._font_size = font_size
 
@@ -207,14 +210,14 @@ class EvalBar(QWidget):
 
         # Score text: cached proportional font size
         font_size = self._font_size
-        
+
         # Determine if the background at the bottom (where text is rendered) is white or black.
         # We use a threshold based on the font size to see if the bottom-most color block is large enough.
         text_threshold = font_size + 4
         if white_on_bottom:
-            bottom_is_white = (white_h >= text_threshold)
+            bottom_is_white = white_h >= text_threshold
         else:
-            bottom_is_white = (total_h - white_h < text_threshold)
+            bottom_is_white = total_h - white_h < text_threshold
 
         text_color = QColor(30, 30, 30) if bottom_is_white else QColor(230, 230, 230)
         p.setPen(text_color)

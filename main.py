@@ -1,4 +1,3 @@
-import json
 import sys
 import os
 from PyQt5.QtWidgets import (
@@ -9,22 +8,14 @@ from PyQt5.QtWidgets import (
     QTextEdit,
     QToolBar,
     QStatusBar,
-    QDialog,
     QVBoxLayout,
-    QPushButton,
-    QHBoxLayout,
-    QLineEdit,
-    QListWidget,
-    QListWidgetItem,
-    QFormLayout,
     QProgressDialog,
     QFileDialog,
     QMessageBox,
     QWidget,
-    QLabel,
     QCheckBox,
 )
-from PyQt5.QtCore import Qt, QFile, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QIcon
 import qtawesome as qta
 
@@ -34,7 +25,7 @@ from core.indexer import PGNIndexerProcess
 from core.styles import LIGHT_QSS, DARK_QSS, LOG_LIGHT_CSS, LOG_DARK_CSS
 from widgets.cql_editor import CqlEditorWidget
 from widgets.game_list_table import GameListTableWidget
-from widgets.game_explorer_widget import GameExplorerWidget
+from dialogs.query_templates_dialog import QueryTemplatesDialog
 
 
 def fa_icon(*names, color="#1F2937"):
@@ -46,217 +37,6 @@ def fa_icon(*names, color="#1F2937"):
             continue
     return qta.icon("fa5s.question")  # fallback icon
 
-
-class QueryTemplatesDialog(QDialog):
-    createQueryRequest = pyqtSignal(str)
-    overwriteQueryRequest = pyqtSignal(int)
-    templateSelected = pyqtSignal(str)
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Query Templates")
-        self.resize(400, 500)
-
-        # Detect dark mode from parent
-        self.dark_mode = False
-        if parent and hasattr(parent, "dark_mode"):
-            self.dark_mode = parent.dark_mode
-
-        layout = QVBoxLayout(self)
-
-        # --- List Widget for Templates ---
-        self.template_list = QListWidget(self)
-        self.template_list.itemClicked.connect(
-            lambda: self.templateSelected.emit(self.get_current_template())
-        )
-        self.template_list.currentRowChanged.connect(self.update_description)
-        layout.addWidget(self.template_list)
-
-        # --- Description Label/Panel ---
-        self.desc_label = QLabel("Select a template to view details.", self)
-        self.desc_label.setWordWrap(True)
-        if self.dark_mode:
-            self.desc_label.setStyleSheet(
-                "color: #bababa; font-style: italic; margin-bottom: 5px; padding: 6px; background: #262421; border-radius: 4px; border: 1px solid #3d3a37;"
-            )
-        else:
-            self.desc_label.setStyleSheet(
-                "color: #666; font-style: italic; margin-bottom: 5px; padding: 6px; background: #f5f5f5; border-radius: 4px; border: 1px solid #e0e0e0;"
-            )
-        layout.addWidget(self.desc_label)
-
-        # --- Input Fields ---
-        input_form = QFormLayout()
-
-        self.input_field = QLineEdit(self)
-        self.input_field.setPlaceholderText("Enter new template name...")
-        input_form.addRow("Name:", self.input_field)
-
-        self.desc_field = QLineEdit(self)
-        self.desc_field.setPlaceholderText("Enter template description...")
-        input_form.addRow("Description:", self.desc_field)
-
-        layout.addLayout(input_form)
-
-        # --- Add, Overwrite & Delete Buttons ---
-        btn_layout = QHBoxLayout()
-        add_btn = QPushButton("Add Template", self)
-        add_btn.setIcon(fa_icon("fa5s.plus", "fa.plus"))
-        add_btn.clicked.connect(
-            lambda: self.createQueryRequest.emit(self.input_field.text())
-        )
-
-        overwrite_btn = QPushButton("Overwrite Selected", self)
-        overwrite_btn.setIcon(fa_icon("fa5s.save", "fa.save"))
-        overwrite_btn.clicked.connect(self.on_overwrite_clicked)
-
-        delete_btn = QPushButton("Delete Selected", self)
-        delete_btn.setIcon(fa_icon("fa5s.trash", "fa.trash"))
-        delete_btn.clicked.connect(self.delete_selected)
-
-        btn_layout.addWidget(add_btn)
-        btn_layout.addWidget(overwrite_btn)
-        btn_layout.addWidget(delete_btn)
-        layout.addLayout(btn_layout)
-
-        # --- Close Button ---
-        close_btn = QPushButton("Close", self)
-        close_btn.setIcon(fa_icon("fa5s.times", "fa.close"))
-        close_btn.clicked.connect(self.close)
-        layout.addWidget(close_btn)
-
-        self.templates = []
-        self.load_templates()
-
-    def get_current_template(self):
-        query_index = self.template_list.currentIndex().row()
-        if 0 <= query_index < len(self.templates):
-            return self.templates[query_index]["query"]
-        return ""
-
-    def update_description(self, row):
-        if 0 <= row < len(self.templates):
-            t = self.templates[row]
-            desc = t.get("description", "No description available.")
-            if not desc:
-                desc = "No description available."
-            self.desc_label.setText(desc)
-            self.input_field.setText(t.get("name", ""))
-            self.desc_field.setText(t.get("description", ""))
-        else:
-            self.desc_label.setText("Select a template to view details.")
-            self.input_field.clear()
-            self.desc_field.clear()
-
-    def load_templates(self):
-        file = QFile("data/queries.json")
-        if file.exists():
-            try:
-                with open("data/queries.json", "r") as f:
-                    self.templates = json.load(f)
-                    self.template_list.clear()
-                    for t in self.templates:
-                        item = QListWidgetItem(t["name"], self.template_list)
-                        desc = t.get("description", "")
-                        if desc:
-                            item.setToolTip(desc)
-            except Exception as e:
-                print("Error loading templates.", e)
-
-    def add_template(self, query):
-        text = self.input_field.text().strip()
-        desc = self.desc_field.text().strip()
-        if text:
-            # Check if template with the same name already exists
-            existing_idx = -1
-            for idx, t in enumerate(self.templates):
-                if t["name"].lower() == text.lower():
-                    existing_idx = idx
-                    break
-
-            if existing_idx != -1:
-                reply = QMessageBox.question(
-                    self,
-                    "Overwrite Template",
-                    f"A template named '{text}' already exists. Do you want to overwrite it with the current query and description?",
-                    QMessageBox.Yes | QMessageBox.No,
-                    QMessageBox.No,
-                )
-                if reply == QMessageBox.Yes:
-                    self.templates[existing_idx]["description"] = desc
-                    self.templates[existing_idx]["query"] = query
-                    try:
-                        with open("data/queries.json", "w") as f:
-                            json.dump(self.templates, f, indent=4)
-                        self.load_templates()
-                        self.input_field.clear()
-                        self.desc_field.clear()
-                    except Exception as e:
-                        print("Error saving template:", e)
-                    return
-                else:
-                    return
-
-            self.templates.append({"name": text, "description": desc, "query": query})
-            try:
-                with open("data/queries.json", "w") as f:
-                    json.dump(self.templates, f, indent=4)
-                self.load_templates()
-                self.input_field.clear()
-                self.desc_field.clear()
-            except Exception as e:
-                print("Error saving template:", e)
-
-    def on_overwrite_clicked(self):
-        index = self.template_list.currentIndex().row()
-        if 0 <= index < len(self.templates):
-            self.overwriteQueryRequest.emit(index)
-        else:
-            QMessageBox.warning(
-                self, "No Selection", "Please select a template to overwrite."
-            )
-
-    def overwrite_template(self, idx, query):
-        if 0 <= idx < len(self.templates):
-            text = self.input_field.text().strip()
-            desc = self.desc_field.text().strip()
-            if not text:
-                QMessageBox.warning(
-                    self, "Invalid Name", "Template name cannot be empty."
-                )
-                return
-
-            old_name = self.templates[idx]["name"]
-            reply = QMessageBox.question(
-                self,
-                "Overwrite Template",
-                f"Are you sure you want to overwrite the selected template '{old_name}' with the current query, name, and description?",
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No,
-            )
-            if reply == QMessageBox.Yes:
-                self.templates[idx]["name"] = text
-                self.templates[idx]["description"] = desc
-                self.templates[idx]["query"] = query
-                try:
-                    with open("data/queries.json", "w") as f:
-                        json.dump(self.templates, f, indent=4)
-                    self.load_templates()
-                    self.template_list.setCurrentRow(idx)
-                except Exception as e:
-                    print("Error overwriting template:", e)
-
-    def delete_selected(self):
-        index = self.template_list.currentIndex().row()
-        if 0 <= index < len(self.templates):
-            self.templates.pop(index)
-            try:
-                with open("data/queries.json", "w") as f:
-                    json.dump(self.templates, f, indent=4)
-                self.load_templates()
-                self.desc_label.setText("Select a template to view details.")
-            except Exception as e:
-                print("Error deleting template:", e)
 
 class ChessCQLiApp(QMainWindow):
     # Emitted when the user double-clicks a game row.
@@ -742,9 +522,9 @@ class ChessCQLiApp(QMainWindow):
             )
             return
 
-        # Delete old output files to avoid stale results
-        self.results_table.clear()
-        for f in ["temp_out.pgn", "temp_out.pgn.db"]:
+        # Reset previous filter/matches
+        self.results_table.clear_filters()
+        for f in ["temp_out.pgn", "temp_out.pgn.idx", "temp_out.pgn.db"]:
             if os.path.exists(f):
                 try:
                     os.remove(f)
@@ -781,16 +561,16 @@ class ChessCQLiApp(QMainWindow):
 
         self.pgnfilename = filename
         self.add_recent_file(filename)
-        db_path = filename + ".db"
+        idx_path = filename + ".idx"
 
-        # Check if SQLite index database already exists next to it and is newer than the PGN file
-        if os.path.exists(db_path) and os.path.getmtime(db_path) >= os.path.getmtime(
+        # Check if companion index already exists next to it and is newer than the PGN file
+        if os.path.exists(idx_path) and os.path.getmtime(idx_path) >= os.path.getmtime(
             filename
         ):
             self.status_bar.showMessage(
                 f"Loading indexed PGN: {os.path.basename(filename)}..."
             )
-            self.results_table.load_db(db_path, filename)
+            self.results_table.load_db(filename, filename)
             return
 
         self.status_bar.showMessage(
@@ -802,23 +582,10 @@ class ChessCQLiApp(QMainWindow):
         self.indexer = PGNIndexerProcess(self)
         self.indexer.finishedSuccessfully.connect(self.on_indexing_finished)
         self.indexer.errorOccurred.connect(self.on_indexing_error)
-        self.indexer.progressMessage.connect(self.log_panel.append)
-
-        # Show standard loading modal
-        self.index_dlg = QProgressDialog(
-            "Indexing PGN file with Rust...", "Cancel", 0, 0, self
-        )
-        self.index_dlg.setWindowTitle("Indexing...")
-        self.indexer.finished.connect(self.index_dlg.close)
-        self.indexer.start()
         self.indexer.index_pgn(filename)
-        self.index_dlg.exec_()
 
-    def on_indexing_finished(self, db_path: str):
-        self.log_panel.append(
-            f"<span class='success'>Indexing completed successfully: {db_path}</span>"
-        )
-        self.results_table.load_db(db_path, self.pgnfilename)
+    def on_indexing_finished(self, pgn_path: str):
+        self.results_table.load_db(pgn_path, self.pgnfilename)
 
     def on_indexing_error(self, error: str):
         self.log_panel.append(f"<span class='error'>Indexing failed: {error}</span>")
@@ -829,20 +596,16 @@ class ChessCQLiApp(QMainWindow):
 
     def on_load_finished(self, count: int):
         current_pgn = self.results_table.model.pgn_path
-        if current_pgn == "temp_out.pgn":
-            self.status_bar.showMessage(f"Loaded query results ({count} matches)")
-            self.results_table.set_info_text(f"{count} matches found")
-            self.game_count = count
-        else:
+        if current_pgn:
             self.status_bar.showMessage(
-                f"Loaded {os.path.basename(current_pgn)} ({count} games)"
+                f"Loaded {os.path.basename(current_pgn)} ({count:,} games)"
             )
-            self.results_table.set_info_text(f"{count} games in database")
+            self.results_table.set_info_text(f"{count:,} games in database")
             self.game_count = count
             self.db_game_count = count
         self.act_run.setEnabled(True)
         self.log_panel.append(
-            f"<span class='success'>Database loaded. {count} games indexed. Ready for query.</span>"
+            f"<span class='success'>Database loaded. {count:,} games indexed. Ready for query.</span>"
         )
 
     def on_cql_success(self):
@@ -851,27 +614,18 @@ class ChessCQLiApp(QMainWindow):
             self.progress_dlg = None
 
         self.log_panel.append(
-            "<span class='success'>CQLi compiled and completed successfully. Indexing results...</span>"
+            "<span class='success'>CQLi compiled and completed successfully.</span>"
         )
 
-        if self.last_query_matches == 0:
-            self.results_table.clear()
+        matches = self.cql.matches_found
+        if not matches and self.last_query_matches == 0:
+            self.results_table.apply_cql_matches([])
             self.status_bar.showMessage("Query completed: 0 matches found.")
             self.results_table.set_info_text("0 matches found")
             return
 
-        self.status_bar.showMessage("Indexing query results...")
-
-        self.result_indexer = PGNIndexerProcess(self)
-        self.result_indexer.finishedSuccessfully.connect(self.on_results_indexed)
-        self.result_indexer.errorOccurred.connect(self.on_indexing_error)
-        self.result_indexer.index_pgn("temp_out.pgn")
-
-    def on_results_indexed(self, db_path: str):
-        self.results_table.load_db(db_path, "temp_out.pgn")
-        self.status_bar.showMessage(
-            f"Query results loaded: {self.results_table.model.total_rows} matches"
-        )
+        self.status_bar.showMessage(f"Query completed: {len(matches):,} matches found.")
+        self.results_table.apply_cql_matches(matches)
 
     def on_cql_finished(self, exitCode, exitStatus, output: str):
         if hasattr(self, "progress_dlg") and self.progress_dlg:
@@ -960,7 +714,7 @@ class ChessCQLiApp(QMainWindow):
             # Clear results to close any open database connection
             self.results_table.clear()
             # Clean up temp files if they exist
-            for f in ["temp.cql", "temp_out.pgn", "temp_out.pgn.db"]:
+            for f in ["temp.cql", "temp_out.pgn", "temp_out.pgn.idx"]:
                 if os.path.exists(f):
                     try:
                         os.remove(f)
@@ -980,6 +734,7 @@ if __name__ == "__main__":
 
     # Wire the window-controller pattern (replaces ChessboardDialog popup)
     from gui.app_controller import AppController
+
     controller = AppController(window)
     window._app_controller = controller  # keep alive for theme propagation
 

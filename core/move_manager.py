@@ -112,14 +112,14 @@ class MoveManager(QObject):
             first_move_num = board.fullmove_number
             first_turn = board.turn
             first_san = board.san(var.move)
-            
+
             if first_turn == chess.WHITE:
                 first_move_formatted = f"{first_move_num}.{first_san}"
             else:
                 first_move_formatted = f"{first_move_num}...{first_san}"
-                
+
             board.push(var.move)
-            
+
             continuation_formatted = []
             temp_node = var
             moves_shown = 1
@@ -128,16 +128,16 @@ class MoveManager(QObject):
                 san = board.san(next_node.move)
                 turn = board.turn
                 move_num = board.fullmove_number
-                
+
                 if turn == chess.WHITE:
                     continuation_formatted.append(f"{move_num}.{san}")
                 else:
                     continuation_formatted.append(san)
-                        
+
                 board.push(next_node.move)
                 temp_node = next_node
                 moves_shown += 1
-                
+
             if continuation_formatted:
                 continuation_str = " ".join(continuation_formatted)
                 line_str = f"{first_move_formatted} {continuation_str}"
@@ -147,7 +147,7 @@ class MoveManager(QObject):
             variations[index] = {
                 "uci": var.move.uci(),
                 "san": first_san,
-                "line": line_str
+                "line": line_str,
             }
         return variations
 
@@ -186,14 +186,14 @@ class MoveManager(QObject):
 
     def get_pgn(self):
         from datetime import date
-        
+
         # Update headers if they are default or missing
         if self.game.headers.get("Event", "?") == "?":
             self.game.headers["Event"] = "Chess Analysis"
-        
+
         if self.game.headers.get("Date", "????.??.??") == "????.??.??":
             self.game.headers["Date"] = date.today().strftime("%Y.%m.%d")
-            
+
         return str(self.game)
 
     def create_mapping(self):
@@ -202,7 +202,6 @@ class MoveManager(QObject):
         # Emit empty string to avoid expensive PGN serialization during navigation
         self.pgnChanged.emit("")
         self.activeNodeChanged.emit()
-
 
     def add_comment(self, index: int, comment: str):
         node = self.get_node_by_index(index)
@@ -247,10 +246,10 @@ class MoveManager(QObject):
                     is_parent = True
                     break
                 temp = temp.parent
-            
+
             if is_parent:
                 self.current_node = parent
-                
+
             self.create_mapping()
             self.is_dirty = True
 

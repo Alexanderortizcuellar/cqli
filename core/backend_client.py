@@ -1,0 +1,208 @@
+import os
+import sys
+import json
+import queue
+import subprocess
+import threading
+from typing import Optional, Dict, Any
+
+from PyQt5.QtCore import QObject, pyqtSignal
+
+
+class BackendClient(QObject):
+    """
+    Manages long-running Rust scid-mgr process communicating over stdin/stdout
+    with a non-blocking asynchronous request queue.
+    """
+
+    response_received = pyqtSignal(dict)
+    process_error = pyqtSignal(str)
+    process_stopped = pyqtSignal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.process: Optional[subprocess.Popen] = None
+        self.reader_thread: Optional[threading.Thread] = None
+        self.writer_thread: Optional[threading.Thread] = None
+        self.write_queue: queue.Queue = queue.Queue()
+        self.running = False
+        self.request_id = 0
+        self._callbacks: Dict[int, Any] = {}
+        self.response_received.connect(self._dispatch_callback)
+
+    def _dispatch_callback(self, data: dict):
+        req_id = data.get("id")
+        if req_id is not None and req_id in self._callbacks:
+            cb = self._callbacks.pop(req_id)
+            try:
+                cb(data)
+            except Exception as e:
+                self.process_error.emit(f"Callback error for request {req_id}: {e}")
+
+    def is_running(self) -> bool:
+        return self.process is not None and self.process.poll() is None
+
+    @staticmethod
+    def find_binary_path() -> Optional[str]:
+        """Locates scid-mgr binary in release or debug target directories."""
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        bin_names = ["scid-mgr.exe", "scid-mgr"]
+        target_dirs = [
+            os.path.join(project_root, "scid-mgr", "target", "release"),
+            os.path.join(project_root, "scid-mgr", "target", "debug"),
+            os.path.join(project_root, "target", "release"),
+            os.path.join(project_root, "target", "debug"),
+        ]
+        for t_dir in target_dirs:
+            for b_name in bin_names:
+                candidate = os.path.join(t_dir, b_name)
+                if os.path.exists(candidate):
+                    return os.path.abspath(candidate)
+        return None
+
+    def start(
+        self,
+        binary_path: Optional[str] = None,
+        db_path: Optional[str] = None,
+        threads: Optional[int] = None,
+    ):
+        if self.is_running():
+            self.stop()
+
+        if not binary_path:
+            binary_path = self.find_binary_path()
+
+        if not binary_path or not os.path.exists(binary_path):
+            raise FileNotFoundError(
+                f"Could not find scid-mgr executable at {binary_path}"
+            )
+
+        cmd = [binary_path, "--interactive"]
+        if threads and threads > 0:
+            cmd.extend(["--threads", str(threads)])
+        if db_path and os.path.exists(db_path):
+            cmd.append(db_path)
+
+        try:
+            self.process = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                encoding="utf-8",
+                bufsize=1,
+                creationflags=subprocess.CREATE_NO_WINDOW
+                if sys.platform == "win32"
+                else 0,
+            )
+        except Exception as e:
+            raise RuntimeError(f"Failed to spawn scid-mgr backend process: {e}")
+
+        self.running = True
+        self.write_queue = queue.Queue()
+
+        # Background reader thread
+        self.reader_thread = threading.Thread(
+            target=self._read_stdout_loop, daemon=True
+        )
+        self.reader_thread.start()
+
+        # Background writer thread
+        self.writer_thread = threading.Thread(
+            target=self._write_stdin_loop, daemon=True
+        )
+        self.writer_thread.start()
+
+        # Monitor stderr
+        threading.Thread(target=self._read_stderr_loop, daemon=True).start()
+
+    def _read_stdout_loop(self):
+        while self.running and self.process and self.process.stdout:
+            line = self.process.stdout.readline()
+            if not line:
+                break
+            line_str = line.strip()
+            if not line_str:
+                continue
+            try:
+                data = json.loads(line_str)
+                self.response_received.emit(data)
+            except json.JSONDecodeError as e:
+                self.process_error.emit(f"Invalid JSON received: {line_str} ({e})")
+
+        self.running = False
+        self.process_stopped.emit()
+
+    def _write_stdin_loop(self):
+        while self.running:
+            try:
+                msg = self.write_queue.get(timeout=0.2)
+            except queue.Empty:
+                continue
+
+            if msg is None:
+                break
+
+            if self.process and self.process.stdin:
+                try:
+                    self.process.stdin.write(msg)
+                    self.process.stdin.flush()
+                except Exception as e:
+                    self.process_error.emit(f"Error writing to backend stdin: {e}")
+                    break
+
+    def _read_stderr_loop(self):
+        while self.running and self.process and self.process.stderr:
+            line = self.process.stderr.readline()
+            if not line:
+                break
+            err_str = line.strip()
+            if err_str:
+                self.process_error.emit(f"[stderr] {err_str}")
+
+    def send_request(
+        self,
+        command: str,
+        params: Optional[dict] = None,
+        callback: Optional[Any] = None,
+    ) -> int:
+        if not self.is_running():
+            return -1
+
+        self.request_id += 1
+        req_id = self.request_id
+        if callback is not None:
+            self._callbacks[req_id] = callback
+
+        req_payload = {"id": req_id, "command": command}
+        if params:
+            req_payload.update(params)
+
+        msg = json.dumps(req_payload) + "\n"
+        self.write_queue.put(msg)
+        return req_id
+
+    def stop(self):
+        if not self.is_running():
+            return
+
+        try:
+            self.send_request("shutdown")
+        except Exception:
+            pass
+
+        self.running = False
+        self.write_queue.put(None)
+
+        if self.process:
+            try:
+                if self.process.stdin:
+                    self.process.stdin.close()
+            except Exception:
+                pass
+            try:
+                self.process.wait(timeout=1.0)
+            except subprocess.TimeoutExpired:
+                self.process.kill()
+            self.process = None

@@ -1,9 +1,19 @@
 from PyQt5.QtWidgets import (
-    QDialog, QWidget, QVBoxLayout, QHBoxLayout, QTableWidget,
-    QTableWidgetItem, QPushButton, QHeaderView, QDialogButtonBox, QLabel,
-    QDateEdit, QComboBox, QMenu
+    QDialog,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QPushButton,
+    QHeaderView,
+    QDialogButtonBox,
+    QLabel,
+    QDateEdit,
+    QComboBox,
+    QMenu,
 )
-from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtCore import QDate
 import qtawesome as qta
 
 
@@ -55,7 +65,7 @@ class PGNHeadersWidget(QWidget):
 
     def parse_pgn_date(self, date_str):
         if date_str:
-            parts = date_str.split('.')
+            parts = date_str.split(".")
             if len(parts) == 3:
                 try:
                     y = int(parts[0])
@@ -119,17 +129,17 @@ class PGNHeadersWidget(QWidget):
         self.table.blockSignals(True)
         self.table.setRowCount(0)
         str_tags = ["Event", "Site", "Date", "Round", "White", "Black", "Result"]
-        
+
         all_tags = list(self.headers.keys())
-        
+
         def tag_sort_key(tag):
             try:
                 return (0, str_tags.index(tag))
             except ValueError:
                 return (1, tag.lower())
-                
+
         sorted_tags = sorted(all_tags, key=tag_sort_key)
-        
+
         for tag in sorted_tags:
             value = self.headers[tag]
             self.add_table_row(tag, value)
@@ -138,10 +148,10 @@ class PGNHeadersWidget(QWidget):
     def add_table_row(self, tag="", value=""):
         row = self.table.rowCount()
         self.table.insertRow(row)
-        
+
         tag_item = QTableWidgetItem(tag)
         self.table.setItem(row, 0, tag_item)
-        
+
         self.update_row_widget(row, tag, value)
         return row
 
@@ -165,7 +175,7 @@ class PGNHeadersWidget(QWidget):
             "PlyCount",
             "EventDate",
             "SetUp",
-            "FEN"
+            "FEN",
         ]
         available_tags = [t for t in all_potential_tags if t not in existing_tags]
 
@@ -232,16 +242,18 @@ class PGNHeadersDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.resize(550, 450)
-        
+
         layout = QVBoxLayout(self)
-        
+
         self.headers_widget = PGNHeadersWidget(self, headers)
         layout.addWidget(self.headers_widget)
-        
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+
+        self.button_box = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        )
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
         layout.addWidget(self.button_box)
-        
+
     def get_headers(self):
         return self.headers_widget.get_headers()

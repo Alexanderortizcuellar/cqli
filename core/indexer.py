@@ -2,8 +2,12 @@ import os
 from PyQt5.QtCore import pyqtSignal, QProcess
 
 
-class PGNIndexerProcess(QProcess):
-    finishedSuccessfully = pyqtSignal(str)  # Emits the SQLite DB path
+class ScidMgrProcess(QProcess):
+    """
+    QProcess wrapper around scid-mgr CLI for fast one-shot PGN / SCID index generation and metadata inspection.
+    """
+
+    finishedSuccessfully = pyqtSignal(str)  # Emits the index file or database path
     errorOccurred = pyqtSignal(str)
     progressMessage = pyqtSignal(str)
 
@@ -17,27 +21,25 @@ class PGNIndexerProcess(QProcess):
 
     def index_pgn(self, pgn_path: str):
         self.output_buffer = ""
-        # The database path will be the pgn path + ".db"
-        self.db_path = pgn_path + ".db"
+        self.db_path = pgn_path
 
-        # Check path of executable relative to application root
+        # Locate scid-mgr executable
         app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         exe_path = os.path.join(
-            app_dir, "pgn_indexer", "target", "release", "pgn_indexer.exe"
+            app_dir, "scid-mgr", "target", "release", "scid-mgr.exe"
         )
 
-        # Fallback to dev/debug if release is not there, though we expect release
         if not os.path.exists(exe_path):
             exe_path = os.path.join(
-                app_dir, "pgn_indexer", "target", "debug", "pgn_indexer.exe"
+                app_dir, "scid-mgr", "target", "debug", "scid-mgr.exe"
             )
 
         if not os.path.exists(exe_path):
-            # Try plain executable on system path
-            exe_path = "pgn_indexer.exe"
+            exe_path = "scid-mgr.exe"
 
         self.setProgram(exe_path)
-        self.setArguments([pgn_path, self.db_path])
+        # Running 'info' automatically scans and generates the companion .pgn.idx index if missing or stale
+        self.setArguments(["info", pgn_path])
         self.start()
 
     def read_output(self):
@@ -50,5 +52,9 @@ class PGNIndexerProcess(QProcess):
             self.finishedSuccessfully.emit(self.db_path)
         else:
             self.errorOccurred.emit(
-                f"Indexer failed with code {exit_code}:\n{self.output_buffer} and exit status {exit_status}"
+                f"scid-mgr failed with code {exit_code}:\n{self.output_buffer} and exit status {exit_status}"
             )
+
+
+# Backwards compatibility alias
+PGNIndexerProcess = ScidMgrProcess

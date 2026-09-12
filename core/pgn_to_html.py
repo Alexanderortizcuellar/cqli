@@ -14,26 +14,28 @@ def flatten_nodes_pgn_order(
     If `annotate_index` is True, attaches `node.flat_index = i` to each node.
     """
     out = []
-    
+
     if not game.variations:
         return []
-        
+
     class Frame:
         def __init__(self, node, sidelines=True):
             self.node = node
             self.state = "pre"
-            self.variations = iter(node.parent.variations[1:]) if sidelines else iter([])
+            self.variations = (
+                iter(node.parent.variations[1:]) if sidelines else iter([])
+            )
 
     stack = [Frame(game.variations[0], sidelines=True)]
-    
+
     while stack:
         top = stack[-1]
-        
+
         if top.state == "pre":
             if top.node.move is not None:
                 out.append(top.node)
             top.state = "variations"
-            
+
         elif top.state == "variations":
             try:
                 variation = next(top.variations)
@@ -45,17 +47,17 @@ def flatten_nodes_pgn_order(
                     top.state = "end"
             else:
                 stack.append(Frame(variation, sidelines=False))
-                
+
         elif top.state == "post":
             top.state = "end"
-            
+
         else:
             stack.pop()
-            
+
     if annotate_index:
         for i, n in enumerate(out):
             n.flat_index = i
-            
+
     return out
 
 
@@ -159,13 +161,14 @@ class HtmlExporterMixin:
             # use current index as ID and href
             is_highlighted = self.move_index == self.highlight_index
             highlight_class = " highlight" if is_highlighted else ""
-            
+
             import re
+
             node_cls = None
             if self.nodes and self.move_index < len(self.nodes):
                 node = self.nodes[self.move_index]
                 if node.comment:
-                    alz_match = re.search(r'\[%alz\s+([^\]]+)\]', node.comment)
+                    alz_match = re.search(r"\[%alz\s+([^\]]+)\]", node.comment)
                     if alz_match:
                         cls_tokens = alz_match.group(1).split()
                         for token in cls_tokens:
@@ -244,7 +247,6 @@ class HtmlExporter(HtmlExporterMixin, chess.pgn.BaseVisitor[str]):
             </style>
             """
 
-
         style = dark_style if self.dark_mode else light_style
         return style + "<div class='moves'>" + " ".join(self.parts) + "</div>"
 
@@ -255,14 +257,27 @@ class HtmlExporter(HtmlExporterMixin, chess.pgn.BaseVisitor[str]):
         self.dark_mode = is_dark_style
 
 
-def pgn_to_html(game: chess.pgn.Game, highlight_node: Optional[chess.pgn.GameNode] = None, style: bool = False, font_family: str = "sans-serif", show_classifications: bool = True):
+def pgn_to_html(
+    game: chess.pgn.Game,
+    highlight_node: Optional[chess.pgn.GameNode] = None,
+    style: bool = False,
+    font_family: str = "sans-serif",
+    show_classifications: bool = True,
+):
     nodes = flatten_nodes_pgn_order(game)
     highlight_index = None
     if highlight_node is not None:
         highlight_index = getattr(highlight_node, "flat_index", None)
-        
-    exporter = HtmlExporter(variations=True, comments=True, headers=False, highlight_index=highlight_index, font_family=font_family, nodes=nodes, show_classifications=show_classifications)
+
+    exporter = HtmlExporter(
+        variations=True,
+        comments=True,
+        headers=False,
+        highlight_index=highlight_index,
+        font_family=font_family,
+        nodes=nodes,
+        show_classifications=show_classifications,
+    )
     exporter.set_style(style)
     data = game.accept(exporter)
     return data, nodes
-

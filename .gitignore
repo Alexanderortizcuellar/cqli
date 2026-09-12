@@ -30,10 +30,13 @@ venv.bak/
 # Application Specific Files
 temp_out.pgn
 temp_out.pgn.db
+temp_out.pgn.idx
 temp_out_test.pgn
+temp.cql
 scratch/
 *.db
 *.sqlite3
+*.idx
 pgn/
 # Logs
 *.log

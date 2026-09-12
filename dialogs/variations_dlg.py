@@ -1,5 +1,12 @@
 # variations_dlg.py
-from PyQt5.QtWidgets import QDialog, QPushButton, QVBoxLayout, QHBoxLayout, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import (
+    QDialog,
+    QPushButton,
+    QVBoxLayout,
+    QHBoxLayout,
+    QListWidget,
+    QListWidgetItem,
+)
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, QEvent
 import qtawesome as qta
@@ -43,7 +50,7 @@ class VariationsDialog(QDialog):
         # Add "Move Up" and "Move Down" buttons horizontally at the bottom
         nav_layout = QHBoxLayout()
         icon_color = "#E5E7EB" if is_dark else "#312e2b"
-        
+
         self.btn_up = QPushButton("Move Up")
         self.btn_up.setIcon(qta.icon("fa5s.arrow-up", color=icon_color))
         self.btn_up.setCursor(Qt.PointingHandCursor)

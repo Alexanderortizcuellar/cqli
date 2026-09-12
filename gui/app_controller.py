@@ -10,7 +10,6 @@ Communication flow:
 """
 
 from PyQt5.QtCore import QObject
-from PyQt5.QtGui import QIcon
 
 from gui.chess_app import ChessAppWindow
 

@@ -124,15 +124,45 @@ class CQLProcess(QProcess):
 
     def on_finished(self, exit_code, exit_status):
         if exit_code == 0:
-            # Emit stats parsed from summary output
+            # Emit stats parsed from summary output (support both singular "match" and plural "matches")
             summary_match = re.search(
-                r"(\d+) CQL matches.*written to", self.stdout_buffer
+                r"(\d+)\s+(?:CQL\s+)?match(?:es)?.*written",
+                self.stdout_buffer,
+                re.IGNORECASE,
+            ) or re.search(
+                r"(\d+)\s+CQL\s+match(?:es)?", self.stdout_buffer, re.IGNORECASE
             )
-            total_games_match = re.search(r"Analyzed (\d+) games", self.stdout_buffer)
+            total_games_match = re.search(
+                r"Analyzed (\d+) games", self.stdout_buffer, re.IGNORECASE
+            )
 
             stats = {}
             if summary_match:
                 stats["numbermatches"] = int(summary_match.group(1))
+            elif self.matches_found:
+                stats["numbermatches"] = len(self.matches_found)
+            else:
+                # Count matches from output file if it exists and has content
+                import os
+
+                if (
+                    os.path.exists(self.output_file)
+                    and os.path.getsize(self.output_file) > 0
+                ):
+                    try:
+                        count = 0
+                        with open(
+                            self.output_file, "r", encoding="utf-8", errors="ignore"
+                        ) as f:
+                            for line in f:
+                                if line.startswith("[Event "):
+                                    count += 1
+                        stats["numbermatches"] = count
+                    except Exception:
+                        stats["numbermatches"] = 0
+                else:
+                    stats["numbermatches"] = 0
+
             if total_games_match:
                 stats["totalgames"] = int(total_games_match.group(1))
             self.statsReceived.emit(stats)

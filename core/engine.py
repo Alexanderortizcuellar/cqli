@@ -24,7 +24,9 @@ class ChessEngine(QtCore.QProcess):
 
     def read_data(self):
         try:
-            raw_data = self.readAllStandardOutput().data().decode("utf-8", errors="replace")
+            raw_data = (
+                self.readAllStandardOutput().data().decode("utf-8", errors="replace")
+            )
         except Exception:
             return
 
@@ -35,7 +37,7 @@ class ChessEngine(QtCore.QProcess):
 
             if "uciok" in line:
                 self.send_command("isready")
-            
+
             if line.startswith("bestmove"):
                 match = re.search(r"bestmove\s+(\S+)", line)
                 if match:
@@ -44,7 +46,7 @@ class ChessEngine(QtCore.QProcess):
                     next_fen = self.next_analyzing_fen
                     next_mode = self.next_mode
                     next_opts = self.next_options
-                    
+
                     self.current_analyzing_fen = next_fen
                     self.next_analyzing_fen = None
                     self.searching = True
@@ -62,7 +64,7 @@ class ChessEngine(QtCore.QProcess):
         if depth_match:
             depth = int(depth_match.group(1))
             self.depthChanged.emit(depth)
-        
+
         # Extract MultiPV index
         multipv = 1
         multipv_match = re.search(r"multipv\s+(\d+)", line)
@@ -74,12 +76,12 @@ class ChessEngine(QtCore.QProcess):
         score_value = None
         cp_match = re.search(r"score cp (-?\d+)", line)
         mate_match = re.search(r"score mate (-?\d+)", line)
-        
+
         # We need to know who is to move to normalize to White POV if the engine doesn't
         # But UCI standard says score is relative to the side to move.
         # However, many implementations (including python-chess) expect absolute (White POV).
         # We'll normalize in the app or here if we have the board state.
-        
+
         if cp_match:
             score_type = "cp"
             score_value = int(cp_match.group(1))
@@ -100,7 +102,7 @@ class ChessEngine(QtCore.QProcess):
                 "score_type": score_type,
                 "score_value": score_value,
                 "pv": pv_moves,
-                "depth": depth if depth_match else None
+                "depth": depth if depth_match else None,
             }
             self.analysisUpdated.emit(info)
 
@@ -108,11 +110,14 @@ class ChessEngine(QtCore.QProcess):
         self.send_command(f"setoption name {name} value {value}")
 
     def send_position(
-        self, position: str, mode: Literal["depth", "time"] = "depth", options: dict = None
+        self,
+        position: str,
+        mode: Literal["depth", "time"] = "depth",
+        options: dict = None,
     ):
         if options is None:
             options = {"depth": 20}
-        
+
         if self.searching:
             self.next_analyzing_fen = position
             self.next_mode = mode
@@ -143,25 +148,25 @@ class ChessEngine(QtCore.QProcess):
         is_running = self.is_running()
         if is_running:
             self.quit()
-        
+
         self.searching = False
         self.next_analyzing_fen = None
         self.current_analyzing_fen = None
-        
+
         self.engine_path = settings.get("path", self.engine_path)
         self.setProgram(self.engine_path)
         self.start()
         if not self.waitForStarted(3000):
             return
-            
+
         self.send_command("uci")
         if not self.waitForReadyRead(3000):
-            pass # Continue anyway
-            
+            pass  # Continue anyway
+
         self.set_option("Threads", settings.get("threads", 1))
         self.set_option("Hash", settings.get("hash", 16))
         self.set_option("MultiPV", settings.get("multipv", 1))
-        
+
         # Syzygy
         syzygy = settings.get("syzygy")
         if syzygy:
@@ -184,4 +189,3 @@ class ChessEngine(QtCore.QProcess):
 
     def is_running(self):
         return self.state() == QtCore.QProcess.Running
-

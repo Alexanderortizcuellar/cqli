@@ -6,16 +6,11 @@ Replaces the old ChessboardDialog (QDialog) approach with the window-controller
 pattern found in qchess.
 """
 
-import os
-
-from PyQt5.QtCore import Qt, QSettings, QSize
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import QSettings, QSize
 from PyQt5.QtWidgets import (
     QMainWindow,
     QAction,
     QToolBar,
-    QApplication,
-    QMessageBox,
 )
 import qtawesome as qta
 
@@ -81,23 +76,17 @@ class ChessAppWindow(QMainWindow):
         tb.setMovable(False)
         self.addToolBar(tb)
 
-        flip_act = QAction(
-            qta.icon("ei.refresh", color="#a9aea7"), "Flip Board", self
-        )
+        flip_act = QAction(qta.icon("ei.refresh", color="#a9aea7"), "Flip Board", self)
         flip_act.setShortcut("Ctrl+F")
         flip_act.triggered.connect(self.explorer.flip_board)
         tb.addAction(flip_act)
 
-        save_act = QAction(
-            qta.icon("fa5s.save", color="#a9aea7"), "Save PGN", self
-        )
+        save_act = QAction(qta.icon("fa5s.save", color="#a9aea7"), "Save PGN", self)
         save_act.setShortcut("Ctrl+S")
         save_act.triggered.connect(self.explorer.save_pgn)
         tb.addAction(save_act)
 
-        copy_act = QAction(
-            qta.icon("fa5s.copy", color="#a9aea7"), "Copy PGN", self
-        )
+        copy_act = QAction(qta.icon("fa5s.copy", color="#a9aea7"), "Copy PGN", self)
         copy_act.setShortcut("Ctrl+C")
         copy_act.triggered.connect(self.explorer.copy_pgn)
         tb.addAction(copy_act)
@@ -105,7 +94,9 @@ class ChessAppWindow(QMainWindow):
         tb.addSeparator()
 
         start_act = QAction(
-            qta.icon("ph.caret-double-left-fill", color="#a9aea7"), "Jump to Start", self
+            qta.icon("ph.caret-double-left-fill", color="#a9aea7"),
+            "Jump to Start",
+            self,
         )
         start_act.triggered.connect(self.explorer.jump_to_start)
         tb.addAction(start_act)
@@ -116,9 +107,7 @@ class ChessAppWindow(QMainWindow):
         back_act.triggered.connect(self.explorer.backward)
         tb.addAction(back_act)
 
-        fwd_act = QAction(
-            qta.icon("mdi.skip-next", color="#a9aea7"), "Next Move", self
-        )
+        fwd_act = QAction(qta.icon("mdi.skip-next", color="#a9aea7"), "Next Move", self)
         fwd_act.triggered.connect(self.explorer.forward)
         tb.addAction(fwd_act)
 
@@ -127,6 +116,19 @@ class ChessAppWindow(QMainWindow):
         )
         end_act.triggered.connect(self.explorer.jump_to_end)
         tb.addAction(end_act)
+
+        tb.addSeparator()
+
+        config_browser_act = QAction(
+            qta.icon("fa5s.sliders-h", color="#a9aea7"),
+            "Configure Notation Browser",
+            self,
+        )
+        config_browser_act.setToolTip(
+            "Configure Notation / PGN View (Layout, Evals, Classifications, etc.)"
+        )
+        config_browser_act.triggered.connect(self.explorer.browser.show_config_dialog)
+        tb.addAction(config_browser_act)
 
     # ──────────────────────── Window Events ────────────────────────
 

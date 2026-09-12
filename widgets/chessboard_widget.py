@@ -111,7 +111,6 @@ class ChessBoardWidget(QtWidgets.QWidget):
             ) or (
                 chess.square_rank(move.to_square) == 0 and piece.color == chess.BLACK
             ):
-
                 dialog = PromotionDialog(piece.color, self)
                 self._selected_promo = chess.QUEEN
 

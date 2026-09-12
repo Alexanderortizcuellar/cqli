@@ -9,7 +9,6 @@ from PyQt5.QtWidgets import (
     QSplitter,
 )
 from PyQt5.QtCore import QSize, Qt, QUrl, pyqtSignal, QEvent, QTimer
-from PyQt5.QtGui import QFont
 import qtawesome as qta
 import re
 import chess
@@ -20,6 +19,7 @@ from widgets.chessboard_widget import ChessBoardWidget
 from widgets.painter_pgn_browser import QPainterPGNBrowser
 from widgets.analysis_widget import AnalysisWidget
 from dialogs.variations_dlg import VariationsDialog
+
 
 class GameExplorerWidget(QWidget):
     """
@@ -49,9 +49,9 @@ class GameExplorerWidget(QWidget):
         self._analysis_update_timer.setSingleShot(True)
         self._analysis_update_timer.setInterval(100)
         self._analysis_update_timer.timeout.connect(self._process_pending_analysis)
-        self._pending_analysis: dict = {}      # multipv → latest info dict
+        self._pending_analysis: dict = {}  # multipv → latest info dict
         self._pending_fen: str | None = None
-        self._has_first_update: bool = False   # suppress timer for very first depth
+        self._has_first_update: bool = False  # suppress timer for very first depth
 
         # ── Anti-lag: engine debounce timer ───────────────────────────────
         # Delays sending a new position to the engine by 150 ms during navigation
@@ -194,7 +194,9 @@ class GameExplorerWidget(QWidget):
         )
 
         # pgnChanged triggers a layout rebuild; activeNodeChanged scrolls to the active move
-        self.move_manager.pgnChanged.connect(lambda _: self.browser.rebuild_layout(force=True))
+        self.move_manager.pgnChanged.connect(
+            lambda _: self.browser.rebuild_layout(force=True)
+        )
         self.move_manager.activeNodeChanged.connect(self.browser.update_active_index)
 
         # Event filter for mouse wheel navigation on chessboard
@@ -364,7 +366,9 @@ class GameExplorerWidget(QWidget):
                 self.analysis_widget.reset_lines()
             if board.is_checkmate():
                 winner = "white" if board.turn == chess.BLACK else "black"
-                self.chessboard.eval_bar.setEngineScore({"type": "checkmate", "winner": winner})
+                self.chessboard.eval_bar.setEngineScore(
+                    {"type": "checkmate", "winner": winner}
+                )
             else:
                 self.chessboard.eval_bar.setEngineScore({"type": "draw"})
             return
@@ -394,7 +398,10 @@ class GameExplorerWidget(QWidget):
 
     def _run_debounced_send_position(self):
         """Actually send the position to the engine (called after debounce)."""
-        if not self.engine.is_running() or not self.analysis_widget.check_analysis.isChecked():
+        if (
+            not self.engine.is_running()
+            or not self.analysis_widget.check_analysis.isChecked()
+        ):
             return
         self.analysis_widget.reset_lines()
         fen = self.chessboard.fen()
@@ -432,7 +439,9 @@ class GameExplorerWidget(QWidget):
             score_value = info.get("score_value", 0)
             if self.chessboard.turn == chess.BLACK:
                 score_value = -score_value
-            self.chessboard.eval_bar.setEngineScore({"type": score_type, "value": score_value})
+            self.chessboard.eval_bar.setEngineScore(
+                {"type": score_type, "value": score_value}
+            )
 
         # Buffer for batched HTML update
         multipv = info.get("multipv", 1)
@@ -450,7 +459,9 @@ class GameExplorerWidget(QWidget):
         """Flush buffered analysis lines to AnalysisWidget in one render call."""
         if not self._pending_analysis:
             return
-        infos = sorted(self._pending_analysis.values(), key=lambda x: x.get("multipv", 1))
+        infos = sorted(
+            self._pending_analysis.values(), key=lambda x: x.get("multipv", 1)
+        )
         fen = self._pending_fen
         self._pending_analysis.clear()
         self.analysis_widget.update_analysis_batch(infos, fen)
